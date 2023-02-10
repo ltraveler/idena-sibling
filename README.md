@@ -11,7 +11,7 @@
 Please make sure that you have a pure Ubuntu 20.04 droplet on the host side.
 The structure of configuration files:
 * `ansible.cfg` all sensitive information is saved in encrypted vault storage. Please write your vault password in .vault_pass file if you don't want to re-enter your vault password every time.  
-* `hosts` change host1_ip to your droplet IP address; please uncomment corresponding line, add your droplet root password, change paths to your droplet private and public ssh_key.
+* `hosts` change `host1_ip` to your droplet IP address; please uncomment corresponding line, add your droplet root password, change paths to your droplet private and public ssh_key.
 * `vars` - change vars based on your requirements.
 * `vault` - encrypted data storage.
 Vault file structure:
@@ -21,6 +21,7 @@ vault_api_key: "f350Aea6f1d62b079E478d3b372966E3"
 vault_node_key: "idena node key"
 userpass: "idena user password"
 ```
+* `ssh-copy-id root@host1_ip` add your pub key as an authorized key in your droplet
 * `ansible-playbook -i hosts idena_install.yaml` run Ansible playbook
 
 PLEASE ATTEND!!! This is pre-alpha version.
