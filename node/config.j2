@@ -1,0 +1,22 @@
+{
+  "DataDir": "datadir",
+  "P2P": {
+    "MaxInboundPeers": {{ maxinboundpeers }},
+    "MaxOutboundPeers": {{ maxoutboundpeers }}
+  },
+  "RPC": {
+    "HTTPHost": "{{ httphost }}",
+    "HTTPPort": {{ httpport }}
+  },
+  "IpfsConf": {
+    "Profile": "server",
+    "IpfsPort": {{ ipfsport }},
+    "BlockPinThreshold": {{ blockpinthreshold }},
+    "FlipPinThreshold": {{ flippinthreshold }}
+  },
+  "Sync": {
+    "LoadAllFlips": {{ loadallflips }},
+    "AllFlipsLoadingTime": {{ allflipsloadingtime }},
+    "FastSync": {{ fastsync }}
+  }
+}

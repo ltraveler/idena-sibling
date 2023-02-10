@@ -1,0 +1,9 @@
+---
+- name: sshd PasswordAuthentication set to '{{ sshd_PasswordAuthentication }}'
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication {{ sshd_PasswordAuthentication }}"
+    validate: "sshd -t -f %s"
+  notify: restart ssh service
+  when: sshd_PasswordAuthentication is defined

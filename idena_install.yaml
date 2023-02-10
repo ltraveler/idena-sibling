@@ -1,0 +1,153 @@
+---
+- name: Install requiered packages
+  hosts: main
+  become: true
+  tasks:
+    - name: Update apt repo and cache
+      apt: update_cache=yes upgrade=dist cache_valid_time=300
+    - name: Checking if reboot is required
+      stat:
+        path: /var/run/reboot-required
+      register: reboot_required_file
+    - name: Rebooting a server if required
+      reboot:
+      when: reboot_required_file.stat.exists == true
+    - name: Install IDENA requiered packages
+      apt:
+        pkg:
+          - jq
+          - git
+          - ufw
+          - curl
+          - wget
+          - nano
+          - screen
+          - psmisc
+          - unzip
+          - netcat-traditional
+
+- hosts: main
+  roles:
+    - role: disable_ssh_password
+      sshd_PasswordAuthentication: "no"
+  become: yes
+
+- name: Some security preparations
+  hosts: main
+  become: true
+  tasks:
+    - name: Deploy root SSH key
+      ansible.posix.authorized_key:
+        user: root
+        state: present
+        exclusive: true
+        key: "{{ lookup('file', '{{ public_key_file }}') }}"
+
+- name: Adding a new user and preparing home folder
+  hosts: main
+  become: true
+  tasks:
+    - name: Create User
+      ansible.builtin.user:
+        name: "{{ username }}"
+        state: present
+        shell: /bin/bash
+        password: "{{ userpass | password_hash('sha512') }}"
+        update_password: on_create
+        groups: "{{ super_group }}"
+        append: yes
+    - name: Deploy SSH Public Key
+      ansible.posix.authorized_key:
+        user: "{{ username }}"
+        state: present
+        exclusive: true
+        key: "{{ lookup('file', '{{ public_key_file }}') }}"
+
+- name: User home folder preparation
+  hosts: main
+  become: true
+  tasks:
+    - name: Check if Idena Exists
+      ansible.builtin.stat: path=/home/{{ username }}/idena-go
+      register: idenago_status
+    - name: Create idena-go, datadir and keystore folder
+      ansible.builtin.file:
+        path: /home/{{ username }}/idena-go/datadir/keystore
+        state: directory
+        mode: "0755"
+        recurse: true
+        owner: "{{ username }}"
+        group: "{{ username }}"
+      when: idenago_status.stat.exists == false
+    - name: Download latest idena-go build
+      ansible.builtin.get_url:
+        url: https://github.com/idena-network/idena-go/releases/download/v{{ idena_go_ver }}/idena-node-linux-{{ idena_go_ver }}
+        dest: /home/{{ username }}/idena-go/idena-node
+        mode: "0755"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+      when: idenago_status.stat.exists == false
+    - name: Changing perm of "idena-go", adding "+x"
+      ansible.builtin.file:
+        dest: /home/{{ username }}/idena-go/idena-node
+        mode: a+x
+        owner: "{{ username }}"
+        group: "{{ username }}"
+      when: idenago_status.stat.exists == false
+    - name: Unpack latest IDENA blockchain snapshot
+      ansible.builtin.git:
+        repo: https://github.com/ltraveler/idenachain.db.git
+        dest: /home/{{ username }}/idena-go/datadir/idenachain.db
+        single_branch: yes
+        version: main
+        update: yes
+      become: yes
+      become_user: "{{ username }}"
+      when: idenago_status.stat.exists == false
+    - name: Template config.json to idena-go
+      ansible.builtin.template:
+        src: ./node/config.j2
+        dest: /home/{{ username }}/idena-go/config.json
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0664"
+    - name: Copying api.key
+      ansible.builtin.template:
+        src: ./node/api.j2
+        dest: /home/{{ username }}/idena-go/datadir/api.key
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0664"
+    - name: Copying nodekey
+      ansible.builtin.template:
+        src: ./node/nodekey.j2
+        dest: /home/{{ username }}/idena-go/datadir/keystore/nodekey
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: "0664"
+
+- name: Creating idena daemon
+  hosts: main
+  become: true
+  tasks:
+    - name: Check if Service Exists
+      ansible.builtin.stat: path=/etc/systemd/system/idena_{{ username }}.service
+      register: service_status
+    - name: Print a debug message
+      ansible.builtin.debug:
+        msg: "Idena Service is not exist"
+      when: service_status.stat.exists == false
+    - name: Copy idena.service
+      ansible.builtin.template:
+        src: ./node/idena_service.j2
+        dest: /etc/systemd/system/idena_{{ username }}.service
+        owner: root
+        group: root
+        mode: 0644
+      when: service_status.stat.exists == false
+      notify: daemon-reload # Don't forget to do `systemctl daemon-reload`!
+  handlers:
+    - name: daemon-reload
+      ansible.builtin.service:
+        name: idena_{{ username }}
+        state: started
