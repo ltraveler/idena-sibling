@@ -10,9 +10,9 @@
 
 Please make sure that you have a pure Ubuntu 20.04 droplet on the host side.
 The structure of configuration files:
-* `ansible.cfg` all sensitive information is saved in encrypted vault storage. Please write your vault password in .vault_pass file if you don't want to enter your vault password evertime when you are willing to make changes.  
-* `hosts` change host1_ip to your droplet IP address; please uncomment corresponding line and add your droplet root password
-* `vars` - change vars based on your requirements
+* `ansible.cfg` all sensitive information is saved in encrypted vault storage. Please write your vault password in .vault_pass file if you don't want to re-enter your vault password every time.  
+* `hosts` change host1_ip to your droplet IP address; please uncomment corresponding line, add your droplet root password, change paths to your droplet private and public ssh_key.
+* `vars` - change vars based on your requirements.
 * `vault` - encrypted data storage.
 Vault file structure:
 ```
