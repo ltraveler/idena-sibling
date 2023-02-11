@@ -77,7 +77,7 @@
         mode: "0755"
         recurse: true
         owner: "{{ username }}"
-        group: "{{ username }}"
+        group: "{{ super_group }}"
       when: idenago_status.stat.exists == false
     - name: Download latest idena-go build
       ansible.builtin.get_url:
@@ -85,14 +85,14 @@
         dest: /home/{{ username }}/idena-go/idena-node
         mode: "0755"
         owner: "{{ username }}"
-        group: "{{ username }}"
+        group: "{{ super_group }}"
       when: idenago_status.stat.exists == false
     - name: Changing perm of "idena-go", adding "+x"
       ansible.builtin.file:
         dest: /home/{{ username }}/idena-go/idena-node
         mode: a+x
         owner: "{{ username }}"
-        group: "{{ username }}"
+        group: "{{ super_group }}"
       when: idenago_status.stat.exists == false
     - name: Unpack latest IDENA blockchain snapshot
       ansible.builtin.git:
@@ -109,21 +109,21 @@
         src: ./node/config.j2
         dest: /home/{{ username }}/idena-go/config.json
         owner: "{{ username }}"
-        group: "{{ username }}"
+        group: "{{ super_group }}"
         mode: "0664"
     - name: Copying api.key
       ansible.builtin.template:
         src: ./node/api.j2
         dest: /home/{{ username }}/idena-go/datadir/api.key
         owner: "{{ username }}"
-        group: "{{ username }}"
+        group: "{{ super_group }}"
         mode: "0664"
     - name: Copying nodekey
       ansible.builtin.template:
         src: ./node/nodekey.j2
         dest: /home/{{ username }}/idena-go/datadir/keystore/nodekey
         owner: "{{ username }}"
-        group: "{{ username }}"
+        group: "{{ super_group }}"
         mode: "0664"
 
 - name: Creating idena daemon
@@ -151,3 +151,20 @@
       ansible.builtin.service:
         name: idena_{{ username }}
         state: started
+
+- name: Setting Firewall rules
+  hosts: main
+  become: true
+  tasks:
+    - name: UFW - Allow SSH connections
+      community.general.ufw:
+        rule: limit
+        name: OpenSSH
+    - name: Allow ipfs port
+      community.general.ufw:
+        rule: allow
+        port: "{{ ipfsport }}"
+    - name: UFW - Enable and deny by default
+      community.general.ufw:
+        state: enabled
+        default: deny
