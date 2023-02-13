@@ -47,6 +47,14 @@
   hosts: main
   become: true
   tasks:
+    - name: Getting a list of user groups
+      getent:
+        database: group
+    - name: Create Idena node users' group
+      group:
+        name: "{{ super_group }}"
+        state: present
+      when: super_group not in ansible_facts.getent_group
     - name: Create Idena user
       ansible.builtin.user:
         name: "{{ username }}"
