@@ -1,9 +1,9 @@
 ---
-- name: Install requiered packages
+- name: Installing requiered packages
   hosts: main
   become: true
   tasks:
-    - name: Update apt repo and cache
+    - name: Updating apt repo and cache
       apt: update_cache=yes upgrade=dist cache_valid_time=300
     - name: Checking if reboot is required
       stat:
@@ -43,11 +43,11 @@
         exclusive: true
         key: "{{ lookup('file', '{{ public_key_file }}') }}"
 
-- name: Adding a new user and preparing home folder
+- name: Adding a new user and creating its home directory
   hosts: main
   become: true
   tasks:
-    - name: Create User
+    - name: Create Idena user
       ansible.builtin.user:
         name: "{{ username }}"
         state: present
@@ -67,7 +67,7 @@
   hosts: main
   become: true
   tasks:
-    - name: Check if Idena Exists
+    - name: Checking if Idena already exists
       ansible.builtin.stat: path=/home/{{ username }}/idena-go
       register: idenago_status
     - name: Create idena-go, datadir and keystore folder
@@ -126,16 +126,16 @@
         group: "{{ super_group }}"
         mode: "0664"
 
-- name: Creating idena daemon
+- name: Creating Idena daemon
   hosts: main
   become: true
   tasks:
-    - name: Check if Service Exists
+    - name: Checking if service exists
       ansible.builtin.stat: path=/etc/systemd/system/idena_{{ username }}.service
       register: service_status
     - name: Print a debug message
       ansible.builtin.debug:
-        msg: "Idena Service is not exist"
+        msg: "Idena service doesn't exist"
       when: service_status.stat.exists == false
     - name: Copy idena.service
       ansible.builtin.template:
@@ -152,19 +152,51 @@
         name: idena_{{ username }}
         state: started
 
-- name: Setting Firewall rules
+- name: Setting UFW rules
   hosts: main
   become: true
   tasks:
-    - name: UFW - Allow SSH connections
+    - name: UFW +SSH connections
       community.general.ufw:
         rule: limit
         name: OpenSSH
-    - name: Allow ipfs port
+    - name: UFW +IPFS port
       community.general.ufw:
         rule: allow
         port: "{{ ipfsport }}"
-    - name: UFW - Enable and deny by default
+    - name: UFW enabled, deny all apart from allowed
       community.general.ufw:
         state: enabled
         default: deny
+
+- name: Increasing some system limits
+  hosts: main
+  become: true
+  tasks:
+    - name: Add or modify nofile hard and soft limits for the idena user
+      community.general.pam_limits:
+        domain: "{{ username }}"
+        limit_type: "-"
+        limit_item: nofile
+        value: "{{ pam_limits_nofile }}"
+    - name: changing system.conf fs.file-max
+      ansible.posix.sysctl:
+        name: fs.file-max
+        value: "{{ fs_filemax }}"
+        state: present
+    - name: systemd system.conf nofile, nproc modification
+      become: true
+      ansible.builtin.lineinfile:
+        dest: /etc/systemd/system.conf
+        regexp: '^\s*#*\s*({{ item.param }})'
+        line: '\1={{ item.value }}'
+        backrefs: yes
+        state: present
+      with_items:
+        - { param: "DefaultLimitNOFILE", value: "{{ limit_nofile_hard }}" }
+        - { param: "DefaultLimitNPROC", value: "{{ limit_nproc_hard }}" }
+      notify: daemon-reexec
+  handlers:
+    - name: daemon-reexec
+      ansible.builtin.systemd:
+        daemon_reexec: true
