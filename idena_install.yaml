@@ -4,7 +4,7 @@
   become: true
   tasks:
     - name: Updating apt repo and cache
-      apt: update_cache=yes upgrade=dist cache_valid_time=300
+      ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=300
     - name: Checking if reboot is required
       stat:
         path: /var/run/reboot-required
@@ -13,7 +13,7 @@
       reboot:
       when: reboot_required_file.stat.exists == true
     - name: Install IDENA requiered packages
-      apt:
+      ansible.builtin.apt:
         pkg:
           - jq
           - git
@@ -52,9 +52,9 @@
         database: group
     - name: Create Idena node users' group
       group:
-        name: "{{ super_group }}"
+        name: "{{ idena_group }}"
         state: present
-      when: super_group not in ansible_facts.getent_group
+      when: idena_group not in ansible_facts.getent_group
     - name: Create Idena user
       ansible.builtin.user:
         name: "{{ username }}"
@@ -62,7 +62,7 @@
         shell: /bin/bash
         password: "{{ userpass | password_hash('sha512') }}"
         update_password: on_create
-        groups: "{{ super_group }}"
+        groups: "{{ idena_group }}"
         append: yes
     - name: Deploy SSH Public Key
       ansible.posix.authorized_key:
@@ -85,7 +85,7 @@
         mode: "0755"
         recurse: true
         owner: "{{ username }}"
-        group: "{{ super_group }}"
+        group: "{{ idena_group }}"
       when: idenago_status.stat.exists == false
     - name: Download latest idena-go build
       ansible.builtin.get_url:
@@ -93,14 +93,14 @@
         dest: /home/{{ username }}/idena-go/idena-node
         mode: "0755"
         owner: "{{ username }}"
-        group: "{{ super_group }}"
+        group: "{{ idena_group }}"
       when: idenago_status.stat.exists == false
     - name: Changing perm of "idena-go", adding "+x"
       ansible.builtin.file:
         dest: /home/{{ username }}/idena-go/idena-node
         mode: a+x
         owner: "{{ username }}"
-        group: "{{ super_group }}"
+        group: "{{ idena_group }}"
       when: idenago_status.stat.exists == false
     - name: Unpack latest IDENA blockchain snapshot
       ansible.builtin.git:
@@ -117,21 +117,21 @@
         src: ./node/config.j2
         dest: /home/{{ username }}/idena-go/config.json
         owner: "{{ username }}"
-        group: "{{ super_group }}"
+        group: "{{ idena_group }}"
         mode: "0664"
     - name: Copying api.key
       ansible.builtin.template:
         src: ./node/api.j2
         dest: /home/{{ username }}/idena-go/datadir/api.key
         owner: "{{ username }}"
-        group: "{{ super_group }}"
+        group: "{{ idena_group }}"
         mode: "0664"
     - name: Copying nodekey
       ansible.builtin.template:
         src: ./node/nodekey.j2
         dest: /home/{{ username }}/idena-go/datadir/keystore/nodekey
         owner: "{{ username }}"
-        group: "{{ super_group }}"
+        group: "{{ idena_group }}"
         mode: "0664"
 
 - name: Creating Idena daemon
@@ -208,3 +208,21 @@
     - name: daemon-reexec
       ansible.builtin.systemd:
         daemon_reexec: true
+
+- name: Installing nodejs
+  hosts: main
+  become: true
+  tasks:
+    - name: "Adding nodejs nodesource apt key"
+      ansible.builtin.apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+    - name: "nodejs ppa for apt"
+      ansible.builtin.apt_repository:
+        repo: deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_facts.distribution_release }} main
+        update_cache: yes
+    - name: "Installing nodejs"
+      ansible.builtin.apt:
+        update_cache: yes
+        name: nodejs
+        state: present
