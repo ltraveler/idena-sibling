@@ -15,3 +15,4 @@ pam_limits_nofile: 65535
 fs_filemax: 65535
 limit_nofile_hard: 65535
 limit_nproc_hard: 65535
+nodejs_version: "16.x"
