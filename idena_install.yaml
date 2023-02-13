@@ -212,6 +212,7 @@
 - name: Installing nodejs
   hosts: main
   become: true
+  tags: nodejs_inst
   tasks:
     - name: "Adding nodejs nodesource apt key"
       ansible.builtin.apt_key:
@@ -226,3 +227,16 @@
         update_cache: yes
         name: nodejs
         state: present
+    - name: pm2 to pm2_check
+      ansible.builtin.command: pm2
+      ignore_errors: true
+      register: pm2_check
+    - name: npm version to npm_ver
+      ansible.builtin.command: npm -v
+      register: npm_ver
+    - name: Install specific npm version
+      ansible.builtin.command: npm install -g npm@{{ npm_version }}
+      when: npm_ver.stdout is version(npm_version, '!=')
+    - name: Install pm2 if not installed
+      ansible.builtin.command: npm i -g pm2
+      when: pm2_check.rc == 2

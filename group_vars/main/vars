@@ -1,5 +1,5 @@
 ---
-idena_go_ver: 0.31.1
+idena_go_ver: "0.31.1"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"
@@ -16,3 +16,4 @@ fs_filemax: 65535
 limit_nofile_hard: 65535
 limit_nproc_hard: 65535
 nodejs_version: "16.x"
+npm_version: "8.19.3"
