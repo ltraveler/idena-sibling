@@ -17,3 +17,4 @@ limit_nofile_hard: 65535
 limit_nproc_hard: 65535
 nodejs_version: "16.x"
 npm_version: "8.19.3"
+api_keys: ["one", "two", "three"]

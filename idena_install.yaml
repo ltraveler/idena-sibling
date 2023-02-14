@@ -5,13 +5,16 @@
   tasks:
     - name: Updating apt repo and cache
       ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=300
+
     - name: Checking if reboot is required
       stat:
         path: /var/run/reboot-required
       register: reboot_required_file
+
     - name: Rebooting a server if required
       reboot:
       when: reboot_required_file.stat.exists == true
+
     - name: Install IDENA requiered packages
       ansible.builtin.apt:
         pkg:
@@ -50,11 +53,13 @@
     - name: Getting a list of user groups
       getent:
         database: group
+
     - name: Create Idena node users' group
       group:
         name: "{{ idena_group }}"
         state: present
       when: idena_group not in ansible_facts.getent_group
+
     - name: Create Idena user
       ansible.builtin.user:
         name: "{{ username }}"
@@ -64,6 +69,7 @@
         update_password: on_create
         groups: "{{ idena_group }}"
         append: yes
+
     - name: Deploy SSH Public Key
       ansible.posix.authorized_key:
         user: "{{ username }}"
@@ -78,6 +84,7 @@
     - name: Checking if Idena already exists
       ansible.builtin.stat: path=/home/{{ username }}/idena-go
       register: idenago_status
+
     - name: Create idena-go, datadir and keystore folder
       ansible.builtin.file:
         path: /home/{{ username }}/idena-go/datadir/keystore
@@ -87,6 +94,7 @@
         owner: "{{ username }}"
         group: "{{ idena_group }}"
       when: idenago_status.stat.exists == false
+
     - name: Download latest idena-go build
       ansible.builtin.get_url:
         url: https://github.com/idena-network/idena-go/releases/download/v{{ idena_go_ver }}/idena-node-linux-{{ idena_go_ver }}
@@ -95,6 +103,7 @@
         owner: "{{ username }}"
         group: "{{ idena_group }}"
       when: idenago_status.stat.exists == false
+
     - name: Changing perm of "idena-go", adding "+x"
       ansible.builtin.file:
         dest: /home/{{ username }}/idena-go/idena-node
@@ -102,6 +111,7 @@
         owner: "{{ username }}"
         group: "{{ idena_group }}"
       when: idenago_status.stat.exists == false
+
     - name: Unpack latest IDENA blockchain snapshot
       ansible.builtin.git:
         repo: https://github.com/ltraveler/idenachain.db.git
@@ -112,6 +122,7 @@
       become: yes
       become_user: "{{ username }}"
       when: idenago_status.stat.exists == false
+
     - name: Template config.json to idena-go
       ansible.builtin.template:
         src: ./node/config.j2
@@ -119,6 +130,7 @@
         owner: "{{ username }}"
         group: "{{ idena_group }}"
         mode: "0664"
+
     - name: Copying api.key
       ansible.builtin.template:
         src: ./node/api.j2
@@ -126,6 +138,7 @@
         owner: "{{ username }}"
         group: "{{ idena_group }}"
         mode: "0664"
+
     - name: Copying nodekey
       ansible.builtin.template:
         src: ./node/nodekey.j2
@@ -141,10 +154,12 @@
     - name: Checking if service exists
       ansible.builtin.stat: path=/etc/systemd/system/idena_{{ username }}.service
       register: service_status
+
     - name: Print a debug message
       ansible.builtin.debug:
         msg: "Idena service doesn't exist"
       when: service_status.stat.exists == false
+
     - name: Copy idena.service
       ansible.builtin.template:
         src: ./node/idena_service.j2
@@ -154,6 +169,7 @@
         mode: 0644
       when: service_status.stat.exists == false
       notify: daemon-reload # Don't forget to do `systemctl daemon-reload`!
+
   handlers:
     - name: daemon-reload
       ansible.builtin.service:
@@ -168,10 +184,12 @@
       community.general.ufw:
         rule: limit
         name: OpenSSH
+
     - name: UFW +IPFS port
       community.general.ufw:
         rule: allow
         port: "{{ ipfsport }}"
+
     - name: UFW enabled, deny all apart from allowed
       community.general.ufw:
         state: enabled
@@ -187,11 +205,13 @@
         limit_type: "-"
         limit_item: nofile
         value: "{{ pam_limits_nofile }}"
+
     - name: changing system.conf fs.file-max
       ansible.posix.sysctl:
         name: fs.file-max
         value: "{{ fs_filemax }}"
         state: present
+
     - name: systemd system.conf nofile, nproc modification
       become: true
       ansible.builtin.lineinfile:
@@ -204,6 +224,7 @@
         - { param: "DefaultLimitNOFILE", value: "{{ limit_nofile_hard }}" }
         - { param: "DefaultLimitNPROC", value: "{{ limit_nproc_hard }}" }
       notify: daemon-reexec
+
   handlers:
     - name: daemon-reexec
       ansible.builtin.systemd:
@@ -218,25 +239,145 @@
       ansible.builtin.apt_key:
         url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
         state: present
+
     - name: "nodejs ppa for apt"
       ansible.builtin.apt_repository:
         repo: deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_facts.distribution_release }} main
         update_cache: yes
+
     - name: "Installing nodejs"
       ansible.builtin.apt:
         update_cache: yes
         name: nodejs
         state: present
+
     - name: pm2 to pm2_check
       ansible.builtin.command: pm2
       ignore_errors: true
       register: pm2_check
+
     - name: npm version to npm_ver
       ansible.builtin.command: npm -v
       register: npm_ver
+
     - name: Install specific npm version
       ansible.builtin.command: npm install -g npm@{{ npm_version }}
       when: npm_ver.stdout is version(npm_version, '!=')
+
     - name: Install pm2 if not installed
       ansible.builtin.command: npm i -g pm2
       when: pm2_check.rc == 2
+
+- name: Installing idena-proxy
+  hosts: main
+  become: true
+  tags: idenaproxy_inst
+  tasks:
+    - name: Checking if Idena proxy exists
+      ansible.builtin.stat: path=/home/{{ username }}/idena-proxy
+      register: idenaproxy_status
+
+    - name: Creating idena-proxy folder
+      ansible.builtin.file:
+        path: /home/{{ username }}/idena-proxy
+        state: directory
+        mode: "0755"
+        recurse: true
+        owner: "{{ username }}"
+        group: "{{ idena_group }}"
+      when: idenaproxy_status.stat.exists == false
+
+    - name: "Cloning idena-proxy"
+      ansible.builtin.git:
+        repo: https://github.com/idena-network/idena-node-proxy.git
+        dest: /home/{{ username }}/idena-proxy
+        single_branch: yes
+        version: master
+        update: yes
+      become: yes
+      become_user: "{{ username }}"
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Idena-proxy preparation
+      ansible.builtin.shell: |
+        sed -i 's/app.listen(parseInt(config.port));/app.listen(parseInt(config.port), '"'"'localhost'"'"');/g' index.js
+      args:
+        executable: /bin/bash
+        chdir: /home/{{ username }}/idena-proxy
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Fetching default config.json
+      ansible.builtin.slurp:
+        src: /home/{{ username }}/idena-proxy/config_default.json
+      register: proxy_config
+      when: idenaproxy_status.stat.exists == false
+
+    - name: config.json b64 > json
+      ansible.builtin.set_fact:
+        idenaproxy_config: "{{ proxy_config.content | b64decode | from_json }}"
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Preparing config.json
+      ansible.utils.update_fact:
+        updates:
+          - path: idenaproxy_config.node.key
+            value: "{{ vault_api_key }}"
+          - path: idenaproxy_config.node.url
+            value: "http://localhost:{{ httpport }}"
+          - path: idenaproxy_config.logs.output
+            value: "file"
+          - path: idenaproxy_config.apiKeys
+            value: "{{ api_keys }}"
+      register: idenaproxy_config
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Writing > config.json
+      ansible.builtin.copy:
+        content: "{{ idenaproxy_config | to_nice_json }}"
+        dest: "/home/{{ username }}/idena-proxy/config.json"
+      become: yes
+      become_user: "{{ username }}"
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Running Idena Proxy
+      ansible.builtin.shell: |
+        npm install
+        npm start
+        pm2 restart idena-node-proxy
+      args:
+        executable: /bin/bash
+        chdir: /home/{{ username }}/idena-proxy
+      become: yes
+      become_user: "{{ username }}"
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Idena Proxy startup for root
+      ansible.builtin.shell: pm2 startup
+      args:
+        executable: /bin/bash
+        chdir: /home/{{ username }}/idena-proxy
+      become: yes
+      become_user: "{{ username }}"
+      when: idenaproxy_status.stat.exists == false
+      register: idena_pm2_startup
+      ignore_errors: true
+
+    - name: Set idena_pm2_startup
+      ansible.builtin.set_fact:
+        idena_pm2_startup: "{{ idena_pm2_startup.stdout_lines[2] }}"
+
+    - name: Idena Proxy as service
+      ansible.builtin.shell: "{{ idena_pm2_startup }}"
+      args:
+        executable: /bin/bash
+      become: yes
+      when: idenaproxy_status.stat.exists == false
+
+    - name: Idena Proxy start on boot
+      ansible.builtin.shell: pm2 save
+      args:
+        executable: /bin/bash
+        chdir: /home/{{ username }}/idena-proxy
+      become: yes
+      become_user: "{{ username }}"
+      when: idenaproxy_status.stat.exists == false
