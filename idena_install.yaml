@@ -28,6 +28,12 @@
           - psmisc
           - unzip
           - netcat-traditional
+          - python3-pip
+
+    - name: Pexpect is required
+      ansible.builtin.pip:
+        name: pexpect
+      become: yes
 
 - hosts: main
   roles:
@@ -168,9 +174,14 @@
         group: root
         mode: 0644
       when: service_status.stat.exists == false
-      notify: daemon-reload # Don't forget to do `systemctl daemon-reload`!
+      notify: daemon-reload
 
   handlers:
+    - name: Enable idena daemon
+      ansible.builtin.service:
+        name: idena_{{ username }}
+        state: enabled
+
     - name: daemon-reload
       ansible.builtin.service:
         name: idena_{{ username }}
@@ -189,6 +200,11 @@
       community.general.ufw:
         rule: allow
         port: "{{ ipfsport }}"
+
+    - name: UFW +HTTPS port
+      community.general.ufw:
+        rule: allow
+        port: "{{ httpsport }}"
 
     - name: UFW enabled, deny all apart from allowed
       community.general.ufw:
@@ -268,18 +284,18 @@
       ansible.builtin.command: npm i -g pm2
       when: pm2_check.rc == 2
 
-- name: Installing idena-proxy
+- name: Installing idena-node-proxy
   hosts: main
   become: true
   tags: idenaproxy_inst
   tasks:
     - name: Checking if Idena proxy exists
-      ansible.builtin.stat: path=/home/{{ username }}/idena-proxy
+      ansible.builtin.stat: path=/home/{{ username }}/idena-node-proxy
       register: idenaproxy_status
 
-    - name: Creating idena-proxy folder
+    - name: Creating idena-node-proxy folder
       ansible.builtin.file:
-        path: /home/{{ username }}/idena-proxy
+        path: /home/{{ username }}/idena-node-proxy
         state: directory
         mode: "0755"
         recurse: true
@@ -287,10 +303,10 @@
         group: "{{ idena_group }}"
       when: idenaproxy_status.stat.exists == false
 
-    - name: "Cloning idena-proxy"
+    - name: "Cloning idena-node-proxy"
       ansible.builtin.git:
         repo: https://github.com/idena-network/idena-node-proxy.git
-        dest: /home/{{ username }}/idena-proxy
+        dest: /home/{{ username }}/idena-node-proxy
         single_branch: yes
         version: master
         update: yes
@@ -298,17 +314,17 @@
       become_user: "{{ username }}"
       when: idenaproxy_status.stat.exists == false
 
-    - name: Idena-proxy preparation
+    - name: idena-node-proxy preparation
       ansible.builtin.shell: |
         sed -i 's/app.listen(parseInt(config.port));/app.listen(parseInt(config.port), '"'"'localhost'"'"');/g' index.js
       args:
         executable: /bin/bash
-        chdir: /home/{{ username }}/idena-proxy
+        chdir: /home/{{ username }}/idena-node-proxy
       when: idenaproxy_status.stat.exists == false
 
     - name: Fetching default config.json
       ansible.builtin.slurp:
-        src: /home/{{ username }}/idena-proxy/config_default.json
+        src: /home/{{ username }}/idena-node-proxy/config_default.json
       register: proxy_config
       when: idenaproxy_status.stat.exists == false
 
@@ -334,7 +350,7 @@
     - name: Writing > config.json
       ansible.builtin.copy:
         content: "{{ idenaproxy_config | to_nice_json }}"
-        dest: "/home/{{ username }}/idena-proxy/config.json"
+        dest: "/home/{{ username }}/idena-node-proxy/config.json"
       become: yes
       become_user: "{{ username }}"
       when: idenaproxy_status.stat.exists == false
@@ -346,7 +362,7 @@
         pm2 restart idena-node-proxy
       args:
         executable: /bin/bash
-        chdir: /home/{{ username }}/idena-proxy
+        chdir: /home/{{ username }}/idena-node-proxy
       become: yes
       become_user: "{{ username }}"
       when: idenaproxy_status.stat.exists == false
@@ -355,7 +371,7 @@
       ansible.builtin.shell: pm2 startup
       args:
         executable: /bin/bash
-        chdir: /home/{{ username }}/idena-proxy
+        chdir: /home/{{ username }}/idena-node-proxy
       become: yes
       become_user: "{{ username }}"
       when: idenaproxy_status.stat.exists == false
@@ -377,7 +393,56 @@
       ansible.builtin.shell: pm2 save
       args:
         executable: /bin/bash
-        chdir: /home/{{ username }}/idena-proxy
+        chdir: /home/{{ username }}/idena-node-proxy
       become: yes
       become_user: "{{ username }}"
       when: idenaproxy_status.stat.exists == false
+
+- name: Deploying haproxy
+  hosts: main
+  become: true
+  tags: haproxy_inst
+  tasks:
+    - name: Adding haproxy PPA
+      ansible.builtin.apt:
+        pkg: software-properties-common
+        install_recommends: false
+        state: present
+
+    - name: Adding haproxy PPA
+      ansible.builtin.apt_repository:
+        repo: "ppa:vbernat/haproxy-2.4"
+        validate_certs: false
+        state: present
+
+    - name: Installing haproxy
+      ansible.builtin.apt:
+        name: haproxy=2.4.*
+        state: present
+
+    - name: Create SSl cert folder
+      ansible.builtin.file:
+        path: /etc/ssl/{{ droplet_domain }}
+        state: directory
+        mode: "0755"
+        recurse: true
+
+    - name: Copying droplet domain cert
+      ansible.builtin.copy:
+        content: "{{ lookup('file', './node/domain_pem') }}"
+        dest: /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Preparing haproxy.cfg
+      ansible.builtin.blockinfile:
+        path: /etc/haproxy/haproxy.cfg
+        block: "{{ lookup('template', './node/haproxy.j2') }}"
+
+    - name: Idena Proxy start on boot
+      ansible.builtin.command: systemctl enable haproxy
+      become: yes
+
+    - name: Display Idena post install msg
+      debug: msg={{ post_install_msg.split('\n') }}
