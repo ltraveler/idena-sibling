@@ -206,7 +206,12 @@
     - name: UFW +HTTPS port
       community.general.ufw:
         rule: allow
-        port: "{{ httpsport }}"
+        port: "{{ ufw_https }}"
+
+    - name: UFW +HTTP port
+      community.general.ufw:
+        rule: allow
+        port: "{{ ufw_http }}"
 
     - name: UFW enabled, deny all apart from allowed
       community.general.ufw:

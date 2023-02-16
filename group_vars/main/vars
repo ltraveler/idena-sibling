@@ -4,6 +4,8 @@ maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "http://localhost"
 httpport: 9009
+ufw_http: 80
+ufw_https: 443
 idenaproxyport: 3000
 godkey: null
 inp_logs_fn: "access.log"
@@ -21,7 +23,6 @@ limit_nofile_hard: 65535
 limit_nproc_hard: 65535
 nodejs_version: "16.x"
 npm_version: "8.19.3"
-httpsport: 443
 post_install_msg: |
   ✨ Idena shared node installation has been successfully completed!
   🗒️ Things left to do:
