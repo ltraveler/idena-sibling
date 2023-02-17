@@ -29,6 +29,7 @@
           - unzip
           - netcat-traditional
           - python3-pip
+          - certbot
 
     - name: Pexpect is required
       ansible.builtin.pip:
