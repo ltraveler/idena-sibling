@@ -52,7 +52,9 @@ Generally, after purchasing an SSL certificate, you will receive a file archive 
 server.csr
 server.key
 ```
-To generate a PEM (Privacy Enhanced Mail) file, you will typically need to concatenate the two files using the following command: `cat server.crt server.key > server.includesprivatekey.pem`
+To generate a PEM (Privacy Enhanced Mail) file, you will typically need to concatenate the two files using the following command:<br>`cat server.crt server.key > server.includesprivatekey.pem`
+
+Please save your pem file as `domain_pem` vault storage file, to do that use the command `ansible-vault create domain_pem` inside the `./idena-sibling/node/` folder of the repository.
 
 ### 🎯&nbsp; Hosts configuration
 
