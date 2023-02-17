@@ -10,6 +10,19 @@
 
 The main goal of this playbook is to help shared node operators deploy Idena Shared Node quickly and securely on multiple servers. You can configure all parameters of your shared node and easily import your API keys. The shared node will be deployed using an HTTPS connection, and you will need an SSL certificate that you can purchase or obtain for free using the Let's Encrypt service.
 
+## 🫴&nbsp; Requirements:
+### Destination droplets:
+
+* Python version 3.9 or higher.
+* Your public SSH key must be added to the authorized_keys file on the server. Alternatively, you may use password authentication as a less secure option.
+* The script has been tested on Ubuntu 20.04 LTS and may work on other Debian-based distributions, but those have not been explicitly tested.
+
+### Master node:
+
+* Python version 3.9 or higher and pip3 must be installed.
+* The latest version of Ansible must be installed on the machine.
+* If you are using a Windows machine, you can run this playbook by using WSL2 with an Ubuntu distribution.
+
 ## 🚀&nbsp; Basic configuration (requires root privileges)
 
 Please make sure that you have a pure Ubuntu 20.04 droplet on the host side.
