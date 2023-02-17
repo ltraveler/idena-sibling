@@ -72,11 +72,11 @@ After setting all parameters, run the playbook using the command `ansible-playbo
     ✧ Try to reach your droplet domain through the web browser.
     ✧ Try to connect to your shared node using any of your API keys via app.idena.io.
     ✦ Please remember that after entering the API key and Shared Node URL in the app.idena.io, your status should become 'ONLINE'.
-  ──────────────────────────────────────────────────
-  💻 LTraveler:
-      💬 Telegram: https://t.me/ltrvlr
-      🌐 WWW: https://ltraveler.github.io
-      👛 0xf041640788910fc89a211cd5bcbf518f4f14d831
+  ──────────────────────────────────────────────────<br>
+  💻 LTraveler:<br>
+      💬 Telegram: https://t.me/ltrvlr<br>
+      🌐 WWW: https://ltraveler.github.io<br>
+      👛 0xf041640788910fc89a211cd5bcbf518f4f14d831<br>
 
 Please note that this is still a beta version, but it has been tested on the author's own droplets.
 There's no warranty, one should use it at one's own risk.
