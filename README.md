@@ -38,9 +38,28 @@ userpass: "the password of the user under which name your shared node gonna be r
 droplet_ip: "your droplet destination ip address"
 droplet_domain: "your.droplet_domain.com"
 api_keys: [ "api_key_1", "api_key_2", "api_key_3" ]
+#ansible_ssh_pass: "your_droplet_root_pass"
 ```
 
 - Public variables are stored in the `./idena-sibling/group_vars/main/vars` file and can be edited directly using a text editor of your choice. The default parameters should be sufficient for most shared node deployment processes.
+
+### 🎯&nbsp; Hosts configuration
+
+All variables related to the destination connection must be set in the main hosts file, which is available in the root folder of the repository and is named `hosts`.
+
+```
+[main]
+XXX.YYY.ZZZ.UUU
+
+[all:vars]
+ansible_ssh_private_key_file = ~/.ssh/id_rsa
+ansible_user = root
+idena_group = Olga
+username = Olga
+public_key_file = ~/.ssh/id_rsa.pub
+#ansible_connection=ssh
+```
+If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier.
 
 ## 🚀&nbsp; Basic configuration (requires root privileges)
 
