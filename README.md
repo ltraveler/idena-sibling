@@ -62,23 +62,10 @@ public_key_file = ~/.ssh/id_rsa.pub
 ```
 If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier.
 
-## 🚀&nbsp; Basic configuration (requires root privileges)
+## 🚀&nbsp; Run the playbook:
 
-Please make sure that you have a pure Ubuntu 20.04 droplet on the host side.
-The structure of configuration files:
-* `ansible.cfg` all sensitive information is saved in encrypted vault storage.   
-* `hosts` change `host1_ip` to your droplet IP address; please uncomment corresponding line, add your droplet root password, change paths to your droplet private and public ssh_key.
-* `vars` - change vars based on your requirements.
-* `vault` - encrypted data storage.
-Vault file structure:
-```
----
-vault_api_key: "f350Aea6f1d62b079E478d3b372966E3"
-vault_node_key: "idena node key"
-userpass: "idena user password"
-```
-* `ssh-copy-id root@host1_ip` add your pub key as an authorized key in your droplet
-* `ansible-playbook -i hosts idena_install.yaml` run Ansible playbook
+* If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX.YYY.ZZZ.UUU` to automatically copy your **public SSH key** to the `authorized_keys` file on your destination droplet server.
+After setting all parameters, run the playbook using the command `ansible-playbook -i hosts idena_install.yaml`.
 
-PLEASE ATTEND!!! This is pre-alpha version.
+Please note that this is still a beta version, but it has been tested on the author's own droplets.
 There's no warranty, one should use it at one's own risk.
