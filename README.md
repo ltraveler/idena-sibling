@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img alt="IDENA Sibling Ansible Playbook - for fast idena-go node client deployment on multiple servers" src="https://github.com/ltraveler/ltraveler/raw/main/images/idena-runner-logo.png" width="224px"/><br/>
+  <img alt="IDENA Sibling Ansible Playbook - for fast idena-go node client deployment on multiple servers" src="https://github.com/ltraveler/ltraveler/raw/main/images/lt_idena_sibling_logo.png" width="224px"/><br/>
   IDENA Sibling
 </h1>
 <p align="center"><b>Ansible Playbook</b> for fast deployment <b>Idena network node</b> on multiple servers.</p>
