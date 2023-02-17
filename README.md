@@ -41,6 +41,7 @@ api_keys: [ "api_key_1", "api_key_2", "api_key_3" ]
 #ansible_ssh_pass: "your_droplet_root_pass"
 ```
 
+- To avoid having to re-enter your vault storage password every time you want to edit it, please save it in the `.vault_pass` plain text file.
 - Public variables are stored in the `./idena-sibling/group_vars/main/vars` file and can be edited directly using a text editor of your choice. The default parameters should be sufficient for most shared node deployment processes.
 
 ### 🎯&nbsp; Hosts configuration
@@ -65,7 +66,7 @@ If you prefer to use root password authentication instead of SSH key authenticat
 
 Please make sure that you have a pure Ubuntu 20.04 droplet on the host side.
 The structure of configuration files:
-* `ansible.cfg` all sensitive information is saved in encrypted vault storage. Please write your vault password in .vault_pass file if you don't want to re-enter your vault password every time.  
+* `ansible.cfg` all sensitive information is saved in encrypted vault storage.   
 * `hosts` change `host1_ip` to your droplet IP address; please uncomment corresponding line, add your droplet root password, change paths to your droplet private and public ssh_key.
 * `vars` - change vars based on your requirements.
 * `vault` - encrypted data storage.
