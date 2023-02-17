@@ -78,5 +78,5 @@ After setting all parameters, run the playbook using the command `ansible-playbo
       🌐 WWW: https://ltraveler.github.io<br>
       👛 `0xf041640788910fc89a211cd5bcbf518f4f14d831`<br>
 
-Please note that this is still a beta version, but it has been tested on the author's own droplets.
+<ins>Please note</ins>: this is still a beta version, but it has been tested on the author's own droplets.
 There's no warranty, one should use it at one's own risk.
