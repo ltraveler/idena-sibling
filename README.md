@@ -23,6 +23,25 @@ The main goal of this playbook is to help shared node operators deploy Idena Sha
 * The latest version of Ansible must be installed on the machine.
 * If you are using a Windows machine, you can run this playbook by using WSL2 with an Ubuntu distribution.
 
+## ⚙️&nbsp; Configuration
+### 🔐&nbsp; Secret and Public vars:
+
+- Secret and public variables are stored in separate files in the `./idena-sibling/group_vars/main/` folder.
+- Public variables are stored in a plain text file with the name `vars`.
+- Sensitive variables are stored in a special secret vault file, which is saved as an encrypted file (`vault`).<br>To edit this file, you must remove the existing one and create a new file with your own password using the command `ansible-vault create vault`. To edit this file in the future, use the command `ansible-vault edit vault`. The file must have a similar structure to the example provided below:
+
+```
+---
+vault_api_key: "your shared node api key"
+vault_node_key: "your shared node pure private key"
+userpass: "the password of the user under which name your shared node gonna be run"
+droplet_ip: "your droplet destination ip address"
+droplet_domain: "your.droplet_domain.com"
+api_keys: [ "api_key_1", "api_key_2", "api_key_3" ]
+```
+
+- Public variables are stored in the `./idena-sibling/group_vars/main/vars` file and can be edited directly using a text editor of your choice. The default parameters should be sufficient for most shared node deployment processes.
+
 ## 🚀&nbsp; Basic configuration (requires root privileges)
 
 Please make sure that you have a pure Ubuntu 20.04 droplet on the host side.
