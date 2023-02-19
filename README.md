@@ -54,7 +54,7 @@ server.key
 ```
 To generate a Privacy Enhanced Mail (PEM) file, you typically need to concatenate the two files using the following command inside the folder that contains the crt and key files:<br>`cat server.crt server.key > domain_pem`
 
-After creating your final PEM file called 'domain_pem', you would need to copy it (overwrite the existed one) to the './idena-sibling/node/' folder of the repository and encrypt it using the command 'ansible-vault encrypt domain_pem'. If you want to change the contents of your certificate vault storage in the future, you can use the command 'ansible-vault edit domain_pem'.
+After creating your final PEM file called `domain_pem`, you would need to copy it (overwrite the existed one) to the `./idena-sibling/node/` folder of the repository and encrypt it using the command `ansible-vault encrypt domain_pem`.<br>If you want to change the contents of your certificate vault storage in the future, you can use the command `ansible-vault edit domain_pem`.
 
 ### 🎯&nbsp; Hosts configuration
 
