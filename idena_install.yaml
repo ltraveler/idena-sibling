@@ -338,7 +338,7 @@
           - path: idenaproxy_config.port
             value: "{{ idenaproxyport }}"
           - path: idenaproxy_config.node.url
-            value: "{{ httphost }}:{{ httpport }}"
+            value: "http://{{ httphost }}:{{ httpport }}"
           - path: idenaproxy_config.godApiKey
             value: "{{ godkey }}"
           - path: idenaproxy_config.logs.output
@@ -444,11 +444,10 @@
         path: /etc/haproxy/haproxy.cfg
         block: "{{ lookup('template', './node/haproxy.j2') }}"
 
-    - name: Idena Proxy start on boot
+    - name: HAProxy start on boot
       ansible.builtin.shell: |
         systemctl enable haproxy
         systemctl restart haproxy
-
       args:
         executable: /bin/bash
       become: yes

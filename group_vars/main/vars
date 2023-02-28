@@ -1,8 +1,8 @@
 ---
-idena_go_ver: "0.31.1"
+idena_go_ver: "1.0.0"
 maxinboundpeers: 12
 maxoutboundpeers: 6
-httphost: "http://localhost"
+httphost: "localhost"
 httpport: 9009
 ufw_http: 80
 ufw_https: 443
