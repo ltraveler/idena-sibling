@@ -44,6 +44,18 @@ api_keys: [ "api_key_1", "api_key_2", "api_key_3" ]
 - To avoid having to re-enter your vault storage password every time you want to edit it, please save it in the `.vault_pass` plain text file in the root folder of the repository.
 - Public variables are stored in the `./idena-sibling/group_vars/main/vars` file and can be edited directly using a text editor of your choice. The default parameters should be sufficient for most shared node deployment processes.
 
+### 📜&nbsp; Generating a PEM file for your SSL certificate:
+
+Generally, after purchasing an SSL certificate, you will receive a file archive containing the following files.
+```
+.crt
+server.csr
+server.key
+```
+To generate a Privacy Enhanced Mail (PEM) file, you typically need to concatenate the two files using the following command inside the folder that contains the crt and key files:<br>`cat server.crt server.key > domain_pem`
+
+After creating your final PEM file called `domain_pem`, you would need to copy it (overwrite the existed one) to the `./idena-sibling/node/` folder of the repository and encrypt it using the command `ansible-vault encrypt domain_pem`.<br>If you want to change the contents of your certificate vault storage in the future, you can use the command `ansible-vault edit domain_pem`.
+
 ### 🎯&nbsp; Hosts configuration
 
 All variables related to the destination connection must be set in the main hosts file, which is available in the root folder of the repository and is named `hosts`.
