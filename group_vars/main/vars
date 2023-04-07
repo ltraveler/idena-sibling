@@ -1,5 +1,5 @@
 ---
-idena_go_ver: "1.0.1"
+idena_go_ver: "1.0.2"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"
