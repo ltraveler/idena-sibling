@@ -1,0 +1,26 @@
+---
+- name: Add or modify nofile hard and soft limits for the idena user
+  community.general.pam_limits:
+    domain: "{{ username }}"
+    limit_type: "-"
+    limit_item: nofile
+    value: "{{ pam_limits_nofile }}"
+
+- name: changing system.conf fs.file-max
+  ansible.posix.sysctl:
+    name: fs.file-max
+    value: "{{ fs_filemax }}"
+    state: present
+
+- name: systemd system.conf nofile, nproc modification
+  become: true
+  ansible.builtin.lineinfile:
+    dest: /etc/systemd/system.conf
+    regexp: '^\s*#*\s*({{ item.param }})'
+    line: '\1={{ item.value }}'
+    backrefs: yes
+    state: present
+  with_items:
+    - { param: "DefaultLimitNOFILE", value: "{{ limit_nofile_hard }}" }
+    - { param: "DefaultLimitNPROC", value: "{{ limit_nproc_hard }}" }
+  notify: daemon-reexec

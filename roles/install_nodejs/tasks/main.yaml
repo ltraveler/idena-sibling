@@ -1,0 +1,33 @@
+---
+- name: "Adding nodejs nodesource apt key"
+  ansible.builtin.apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+
+- name: "nodejs ppa for apt"
+  ansible.builtin.apt_repository:
+    repo: deb https://deb.nodesource.com/node_{{ nodejs_version }} {{ ansible_facts.distribution_release }} main
+    update_cache: yes
+
+- name: "Installing nodejs"
+  ansible.builtin.apt:
+    update_cache: yes
+    name: nodejs
+    state: present
+
+- name: npm version to npm_ver
+  ansible.builtin.shell: npm -v
+  args:
+    executable: /bin/bash
+  register: npm_ver
+
+- name: Install specific npm version
+  ansible.builtin.shell: npm install -g npm@{{ npm_version }}
+  args:
+    executable: /bin/bash
+  when: npm_ver.stdout is version(npm_version, '!=')
+
+- name: Installing pm2
+  ansible.builtin.shell: npm i -g pm2
+  args:
+    executable: /bin/bash

@@ -1,0 +1,66 @@
+---
+- name: Checking if Idena already exists
+  ansible.builtin.stat: path=/home/{{ username }}/idena-go
+  register: idenago_status
+
+- name: Create idena-go, datadir and keystore folder
+  ansible.builtin.file:
+    path: /home/{{ username }}/idena-go/datadir/keystore
+    state: directory
+    mode: "0755"
+    recurse: true
+    owner: "{{ username }}"
+    group: "{{ idena_group }}"
+  when: idenago_status.stat.exists == false
+
+- name: Download latest idena-go build
+  ansible.builtin.get_url:
+    url: https://github.com/idena-network/idena-go/releases/download/v{{ idena_go_ver }}/idena-node-linux-{{ idena_go_ver }}
+    dest: /home/{{ username }}/idena-go/idena-node
+    mode: "0755"
+    owner: "{{ username }}"
+    group: "{{ idena_group }}"
+  when: idenago_status.stat.exists == false
+
+- name: Changing perm of "idena-go", adding "+x"
+  ansible.builtin.file:
+    dest: /home/{{ username }}/idena-go/idena-node
+    mode: a+x
+    owner: "{{ username }}"
+    group: "{{ idena_group }}"
+  when: idenago_status.stat.exists == false
+
+- name: "Unpack latest IDENA blockchain snapshot"
+  ansible.builtin.shell: |
+    curl -L  "https://github.com/ltraveler/idenachain.db/archive/main.tar.gz" | tar -xzf -
+    mv -f idenachain.db-main idenachain.db
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/idena-go/datadir
+  become: true
+  become_user: "{{ username }}"
+  when: idenago_status.stat.exists == false
+
+- name: Template config.json to idena-go
+  ansible.builtin.template:
+    src: ./node/config.j2
+    dest: /home/{{ username }}/idena-go/config.json
+    owner: "{{ username }}"
+    group: "{{ idena_group }}"
+    mode: "0664"
+
+- name: Copying api.key
+  ansible.builtin.template:
+    src: ./node/api.j2
+    dest: /home/{{ username }}/idena-go/datadir/api.key
+    owner: "{{ username }}"
+    group: "{{ idena_group }}"
+    mode: "0664"
+
+- name: Copying nodekey
+  ansible.builtin.template:
+    src: ./node/nodekey.j2
+    dest: /home/{{ username }}/idena-go/datadir/keystore/nodekey
+    owner: "{{ username }}"
+    group: "{{ idena_group }}"
+    mode: "0664"

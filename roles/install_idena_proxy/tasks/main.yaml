@@ -1,0 +1,82 @@
+---
+- name: Checking if Idena proxy exists
+  ansible.builtin.stat: path=/home/{{ username }}/idena-node-proxy
+  register: idenaproxy_status
+
+- name: "Cloning idena-node-proxy"
+  ansible.builtin.shell: |
+    curl -L  "https://github.com/idena-network/idena-node-proxy/archive/master.tar.gz" | tar -xzf -
+    mv -f idena-node-proxy-master idena-node-proxy
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/
+  when: idenaproxy_status.stat.exists == false
+
+- name: idena-node-proxy preparation
+  ansible.builtin.shell: |
+    sed -i 's/app.listen(parseInt(config.port));/app.listen(parseInt(config.port), '"'"'localhost'"'"');/g' index.js
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/idena-node-proxy
+  when: idenaproxy_status.stat.exists == false
+
+- name: Fetching default config.json
+  ansible.builtin.slurp:
+    src: /home/{{ username }}/idena-node-proxy/config_default.json
+  register: proxy_config
+  when: idenaproxy_status.stat.exists == false
+
+- name: config.json b64 > json
+  ansible.builtin.set_fact:
+    idenaproxy_config: "{{ proxy_config.content | b64decode | from_json }}"
+  when: idenaproxy_status.stat.exists == false
+
+- name: Preparing config.json
+  ansible.utils.update_fact:
+    updates:
+      - path: idenaproxy_config.node.key
+        value: "{{ vault_api_key }}"
+      - path: idenaproxy_config.port
+        value: "{{ idenaproxyport }}"
+      - path: idenaproxy_config.node.url
+        value: "http://{{ httphost }}:{{ httpport }}"
+      - path: idenaproxy_config.godApiKey
+        value: "{{ godkey }}"
+      - path: idenaproxy_config.logs.output
+        value: "file"
+      - path: idenaproxy_config.apiKeys
+        value: "{{ api_keys }}"
+  register: idenaproxy_config
+  when: idenaproxy_status.stat.exists == false
+
+- name: Writing > config.json
+  ansible.builtin.copy:
+    content: "{{ idenaproxy_config.idenaproxy_config | to_nice_json }}"
+    dest: "/home/{{ username }}/idena-node-proxy/config.json"
+  when: idenaproxy_status.stat.exists == false
+
+- name: Running Idena Proxy
+  ansible.builtin.shell: |
+    npm install
+    npm start
+    pm2 restart idena-node-proxy
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/idena-node-proxy
+  when: idenaproxy_status.stat.exists == false
+
+- name: Idena Proxy startup for root
+  ansible.builtin.shell: pm2 startup
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/idena-node-proxy
+  when: idenaproxy_status.stat.exists == false
+  register: idena_pm2_startup
+  ignore_errors: true
+
+- name: Set idena_pm2_startup
+  ansible.builtin.set_fact:
+    idena_pm2_startup: "{{ idena_pm2_startup.stdout_lines[2] }}"
+
+- name: print idena_pm2
+  debug: msg={{ idena_pm2_startup }}

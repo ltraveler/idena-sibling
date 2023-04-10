@@ -1,0 +1,21 @@
+---
+- name: Updating apt repo and cache
+  ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=100
+
+- name: Install IDENA requiered packages
+  ansible.builtin.apt:
+    pkg: "{{ required_packages }}"
+
+- name: Checking if reboot is required
+  stat:
+    path: /var/run/reboot-required
+  register: reboot_required_file
+
+- name: Rebooting a server if required
+  reboot:
+  when: reboot_required_file.stat.exists == true
+
+- name: Pexpect is required
+  ansible.builtin.pip:
+    name: pexpect
+  become: yes

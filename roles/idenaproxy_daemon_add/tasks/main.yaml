@@ -1,0 +1,15 @@
+---
+- name: PM2 registering as service
+  ansible.builtin.shell: "{{ idena_pm2_startup }}"
+  args:
+    executable: /bin/bash
+  when: idenaproxy_status.stat.exists == false
+
+- name: Idena Proxy start on boot
+  ansible.builtin.shell: pm2 save
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/idena-node-proxy
+  become: true
+  become_user: "{{ username }}"
+  when: idenaproxy_status.stat.exists == false

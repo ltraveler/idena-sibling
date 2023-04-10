@@ -1,0 +1,4 @@
+galaxy_info:
+  role_name: install_required_packages
+  description: Install required packages
+  author: LTraveler

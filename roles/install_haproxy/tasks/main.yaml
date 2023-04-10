@@ -1,0 +1,48 @@
+---
+- name: Adding software-properties-common
+  ansible.builtin.apt:
+    pkg: software-properties-common
+    install_recommends: false
+    state: present
+
+- name: Adding haproxy PPA
+  ansible.builtin.apt_repository:
+    repo: "ppa:vbernat/haproxy-2.4"
+    validate_certs: false
+    state: present
+
+- name: Installing haproxy
+  ansible.builtin.apt:
+    name: "haproxy=2.4.*"
+    state: present
+
+- name: Create SSl cert folder
+  ansible.builtin.file:
+    path: /etc/ssl/{{ droplet_domain }}
+    state: directory
+    mode: "0755"
+    recurse: true
+
+- name: Copying droplet domain cert
+  ansible.builtin.copy:
+    content: "{{ lookup('file', './node/domain_pem') }}"
+    dest: /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Preparing haproxy.cfg
+  ansible.builtin.blockinfile:
+    path: /etc/haproxy/haproxy.cfg
+    block: "{{ lookup('template', './node/haproxy.j2') }}"
+
+- name: HAProxy start on boot
+  ansible.builtin.shell: |
+    systemctl enable haproxy
+    systemctl restart haproxy
+  args:
+    executable: /bin/bash
+  become: yes
+
+- name: Display Idena post install msg
+  debug: msg={{ post_install_msg.split('\n') }}

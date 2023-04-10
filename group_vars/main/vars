@@ -1,5 +1,21 @@
 ---
-idena_go_ver: "1.0.2"
+idena_go_ver: "1.0.3"
+required_packages:
+  [
+    jq,
+    git,
+    ufw,
+    curl,
+    wget,
+    nano,
+    screen,
+    psmisc,
+    unzip,
+    netcat-traditional,
+    python3-pip,
+    certbot,
+  ]
+sshd_PasswordAuthentication: "no"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"

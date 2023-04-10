@@ -1,0 +1,25 @@
+---
+- name: UFW +SSH connections
+  community.general.ufw:
+    rule: limit
+    name: OpenSSH
+
+- name: UFW +IPFS port
+  community.general.ufw:
+    rule: allow
+    port: "{{ ipfsport }}"
+
+- name: UFW +HTTPS port
+  community.general.ufw:
+    rule: allow
+    port: "{{ ufw_https }}"
+
+- name: UFW +HTTP port
+  community.general.ufw:
+    rule: allow
+    port: "{{ ufw_http }}"
+
+- name: UFW enabled, deny all apart from allowed
+  community.general.ufw:
+    state: enabled
+    default: deny

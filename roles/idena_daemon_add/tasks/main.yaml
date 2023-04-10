@@ -1,0 +1,20 @@
+---
+- name: Checking if service exists
+  ansible.builtin.stat: path=/etc/systemd/system/idena_{{ username }}.service
+  register: service_status
+
+- name: Print a debug message
+  ansible.builtin.debug:
+    msg: "Idena service doesn't exist"
+  when: service_status.stat.exists == false
+
+- name: Copy idena.service
+  ansible.builtin.template:
+    src: ./node/idena_service.j2
+    dest: /etc/systemd/system/idena_{{ username }}.service
+    owner: root
+    group: root
+    mode: 0644
+  when: service_status.stat.exists == false
+  notify:
+    - idena-enable

@@ -1,0 +1,7 @@
+---
+- name: Deploy root SSH key
+  ansible.posix.authorized_key:
+    user: root
+    state: present
+    exclusive: true
+    key: "{{ lookup('file', '{{ public_key_file }}') }}"

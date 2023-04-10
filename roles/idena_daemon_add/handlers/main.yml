@@ -1,0 +1,7 @@
+---
+- name: idena-enable
+  ansible.builtin.service:
+    name: idena_{{ username }}
+    daemon_reload: true
+    enabled: yes
+    state: started

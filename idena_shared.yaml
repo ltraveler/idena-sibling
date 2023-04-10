@@ -1,0 +1,24 @@
+---
+- name: Idena Deployment
+  hosts: main
+  become: yes
+
+  roles:
+    - install_required_packages
+    - disable_ssh_password
+    - security_preparations
+    - idena_user_add
+    - idena_user_home
+    - idena_daemon_add
+    - ufw_rules
+    - system_limits
+    - role: install_nodejs
+      tags: [nodejs_inst]
+    - role: install_idena_proxy
+      tags: [idenaproxy_inst]
+      become: true
+      become_user: "{{ username }}"
+    - role: idenaproxy_daemon_add
+      tags: [iproxy_as_service]
+    - role: install_haproxy
+      tags: [haproxy_inst]
