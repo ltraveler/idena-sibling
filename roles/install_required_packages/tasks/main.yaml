@@ -15,7 +15,8 @@
   reboot:
   when: reboot_required_file.stat.exists == true
 
-- name: Pexpect is required
+- name: Installing required python packages
   ansible.builtin.pip:
-    name: pexpect
+    name:
+      - pexpect
   become: yes

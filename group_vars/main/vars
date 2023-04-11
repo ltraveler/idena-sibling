@@ -16,6 +16,7 @@ required_packages:
     certbot,
   ]
 sshd_PasswordAuthentication: "no"
+letsencrypt: "yes"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"
