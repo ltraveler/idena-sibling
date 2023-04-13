@@ -1,3 +1,5 @@
 ---
+roles:
+  - name: geerlingguy.certbot
 collections:
   - name: community.general

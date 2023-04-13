@@ -20,5 +20,11 @@
       become_user: "{{ username }}"
     - role: idenaproxy_daemon_add
       tags: [iproxy_as_service]
+    - role: install_haproxy_letsencrypt
+      tags: [haproxy_inst_letsencrypt]
+      vars:
+        current_domain_ip: "{{ lookup('community.general.dig', droplet_domain) }}"
+      when: current_domain_ip == droplet_ip and letsencrypt|bool == True
     - role: install_haproxy
       tags: [haproxy_inst]
+      when: letsencrypt|bool == False

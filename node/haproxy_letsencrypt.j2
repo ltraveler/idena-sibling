@@ -1,0 +1,17 @@
+frontend www-http
+        bind {{ droplet_ip }}:80
+        acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+        use_backend letsencrypt-backend if letsencrypt-acl
+#        bind {{ droplet_ip }}:443 ssl crt /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
+        # redirects HTTP to HTTPS
+#        http-request redirect scheme https unless { ssl_fc }
+
+        # HSTS setup, max-age is mandatory, 16000000 seconds is a bit more than 6 months
+        #http-response set-header Strict-Transport-Security ""max-age=16000000; includeSubDomains; preload;""
+        default_backend idena-node
+
+backend idena-node
+        server idenaproxy 127.0.0.1:3000 check
+
+backend letsencrypt-backend
+        server letsencrypt localhost:8888

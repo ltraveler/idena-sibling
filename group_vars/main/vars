@@ -17,6 +17,7 @@ required_packages:
   ]
 sshd_PasswordAuthentication: "no"
 letsencrypt: "yes"
+letsencrypt_email: "ltraveler@protonmail.com"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"
