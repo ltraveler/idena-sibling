@@ -1,0 +1,3 @@
+---
+api_keys_add: ["key_to_add1", "key_to_add2", "key_to_add3"]
+api_keys_remove: ["key_to_remove1", "key_to_remove2", "key_to_remove3"]
