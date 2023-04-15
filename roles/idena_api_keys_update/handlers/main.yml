@@ -1,0 +1,8 @@
+---
+- name: idena-proxy-restart
+  ansible.builtin.shell: pm2 restart idena-node-proxy
+  args:
+    executable: /bin/bash
+    chdir: /home/{{ username }}/idena-node-proxy
+  become: true
+  become_user: "{{ username }}"

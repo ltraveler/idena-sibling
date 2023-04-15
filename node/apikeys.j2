@@ -1,0 +1,3 @@
+{% set api_keys_list = idena_config_json_data.apiKeys | to_json %}
+---
+api_keys: {{ api_keys_list }}
