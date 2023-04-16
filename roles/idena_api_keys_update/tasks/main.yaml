@@ -39,5 +39,5 @@
   become: no
   ansible.builtin.template:
     src: ./node/apikeys.j2
-    dest: ./group_vars/main/api_keys.yaml
+    dest: "{{ api_keys_path }}"
   delegate_to: localhost

@@ -1,0 +1,63 @@
+---
+- name: Idena Node Management
+  hosts: main
+  become: yes
+  become_user: "{{ username }}"
+
+  tasks:
+    - name: Check if idena node daemon is run
+      ansible.builtin.service_facts:
+      tags: always
+
+    # Mining Management
+    - name: Mining ON
+      block:
+        - name: dna_becomeOnline
+          ansible.builtin.uri:
+            url: http://{{ httphost }}:{{ httpport }}
+            method: POST
+            headers:
+              Content-Type: application/json
+            body_format: json
+            body:
+              jsonrpc: "2.0"
+              key: "{{ vault_api_key }}"
+              id: 1
+              method: "dna_becomeOnline"
+              params:
+                - {}
+            return_content: yes
+          register: responseMiningOn
+
+        - name: stdout of dna_becomeOnline to variable
+          debug:
+            var: responseMiningOn.content
+      tags: [never, IdenaMiningOn]
+      when: ansible_facts.services['idena_Olga.service'].state == 'running'
+
+    - name: Mining OFF
+      block:
+        - name: dna_becomeOffline
+          ansible.builtin.uri:
+            url: http://{{ httphost }}:{{ httpport }}
+            method: POST
+            headers:
+              Content-Type: application/json
+            body_format: json
+            body:
+              jsonrpc: "2.0"
+              key: "{{ vault_api_key }}"
+              id: 1
+              method: "dna_becomeOffline"
+              params:
+                - {}
+            return_content: yes
+          register: responseMiningOff
+
+        - name: stdout of dna_becomeOffline to variable
+          debug:
+            var: responseMiningOff.content
+
+      tags: [never, IdenaMiningOff]
+      when: ansible_facts.services['idena_Olga.service'].state == 'running'
+    # Node Management
