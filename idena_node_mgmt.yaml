@@ -2,14 +2,13 @@
 - name: Idena Node Management
   hosts: main
   become: yes
-  become_user: "{{ username }}"
 
   tasks:
     - name: Check if idena node daemon is run
       ansible.builtin.service_facts:
       tags: always
 
-    # Mining Management
+    # Mining Management: ON/OFF
     - name: Mining ON
       block:
         - name: dna_becomeOnline
@@ -33,7 +32,7 @@
           debug:
             var: responseMiningOn.content
       tags: [never, IdenaMiningOn]
-      when: ansible_facts.services['idena_Olga.service'].state == 'running'
+      when: ansible_facts.services["idena_" + username + ".service"].state == 'running'
 
     - name: Mining OFF
       block:
@@ -59,5 +58,35 @@
             var: responseMiningOff.content
 
       tags: [never, IdenaMiningOff]
-      when: ansible_facts.services['idena_Olga.service'].state == 'running'
-    # Node Management
+      when: ansible_facts.services["idena_" + username + ".service"].state == 'running'
+
+    # Node Management: ON/OFF
+    - name: Start Idena Daemon
+      block:
+        - name: Service idena_{{ username }} start
+          ansible.builtin.service:
+            name: idena_{{ username }}
+            state: started
+          register: responseNodeStart
+
+        - name: stdout of responseNodeStart to variable
+          debug:
+            var: responseNodeStart.state
+
+      tags: [never, IdenaNodeStart]
+      when: ansible_facts.services["idena_" + username + ".service"].state == 'stopped'
+
+    - name: Stop Idena Daemon
+      block:
+        - name: Service idena_{{ username }} stop
+          ansible.builtin.service:
+            name: idena_{{ username }}
+            state: stopped
+          register: responseNodeStop
+
+        - name: stdout of responseNodeStop to variable
+          debug:
+            var: responseNodeStop.state
+
+      tags: [never, IdenaNodeStop]
+      when: ansible_facts.services["idena_" + username + ".service"].state == 'running'
