@@ -3,6 +3,12 @@
   hosts: main
   become: yes
 
+  handlers:
+    - name: IdenaNodeRestart
+      ansible.builtin.service:
+        name: idena_{{ username }}
+        state: restarted
+
   tasks:
     - name: Check if idena node daemon is run
       ansible.builtin.service_facts:
@@ -31,6 +37,7 @@
         - name: stdout of dna_becomeOnline to variable
           debug:
             var: responseMiningOn.content
+
       tags: [never, IdenaMiningOn]
       when: ansible_facts.services["idena_" + username + ".service"].state == 'running'
 
@@ -90,3 +97,16 @@
 
       tags: [never, IdenaNodeStop]
       when: ansible_facts.services["idena_" + username + ".service"].state == 'running'
+
+    # Private/API Keys Management
+    - name: Nodekey Update
+      block:
+        - name: Overwrite new value into the nodekey file
+          ansible.builtin.copy:
+            content: "{{ vault_node_key }}"
+            dest: "/home/{{ username }}/idena-go/datadir/keystore/nodekey"
+            owner: "{{ username }}"
+            group: "{{ idena_group }}"
+          notify: IdenaNodeRestart
+
+      tags: [never, IdenaNodekeyUpdate]
