@@ -1,5 +1,5 @@
 ---
-- name: Idena Node Management
+- name: Idena Node and Idena Proxy Management
   hosts: main
   become: yes
 
@@ -9,9 +9,29 @@
         name: idena_{{ username }}
         state: restarted
 
+    - name: idena-proxy-restart
+      ansible.builtin.shell: pm2 restart idena-node-proxy
+      args:
+        executable: /bin/bash
+        chdir: /home/{{ username }}/idena-node-proxy
+      become: true
+      become_user: "{{ username }}"
+
   tasks:
     - name: Check if idena node daemon is run
       ansible.builtin.service_facts:
+      tags: always
+
+    - name: Check if idena go is installed
+      ansible.builtin.stat:
+        path: /home/{{ username }}/idena-go/config.json
+      register: idenanode
+      tags: always
+
+    - name: Check if idena-node-proxy is installed
+      ansible.builtin.stat:
+        path: /home/{{ username }}/idena-node-proxy/config.json
+      register: idenaproxy
       tags: always
 
     # Mining Management: ON/OFF
@@ -110,3 +130,52 @@
           notify: IdenaNodeRestart
 
       tags: [never, IdenaNodekeyUpdate]
+
+    # Update API keys
+    - name: Update node API keys
+      block:
+        - name: Checking if Idena proxy exists
+          ansible.builtin.stat: path=/home/{{ username }}/idena-node-proxy/config.json
+          register: idenaproxy_mgmt_status
+
+        - name: Stop execution if config file is missing
+          ansible.builtin.fail:
+            msg: "Idena node proxy config.json file does not exists."
+          when: not idenaproxy_mgmt_status.stat.exists
+
+        - name: Read JSON file
+          ansible.builtin.slurp:
+            src: /home/{{ username }}/idena-node-proxy/config.json
+          register: idena_config_json
+
+        - name: Parse JSON data
+          ansible.builtin.set_fact:
+            idena_config_json_data: "{{ idena_config_json.content | b64decode | from_json }}"
+
+        - name: Add new data to apiKeys array
+          ansible.builtin.set_fact:
+            idena_config_json_data: "{{ idena_config_json_data | combine({'apiKeys': idena_config_json_data.apiKeys + api_keys_add}) }}"
+
+        - name: Remove data from apiKeys array
+          ansible.builtin.set_fact:
+            idena_config_json_data: "{{ idena_config_json_data | combine({'apiKeys': idena_config_json_data.apiKeys | difference(api_keys_remove)}) }}"
+
+        - name: Remove duplicates from apiKeys array
+          ansible.builtin.set_fact:
+            idena_config_json_data: "{{ idena_config_json_data | combine({'apiKeys': idena_config_json_data.apiKeys | unique}) }}"
+
+        - name: Save updated JSON file
+          ansible.builtin.copy:
+            content: "{{ idena_config_json_data | to_nice_json }}"
+            dest: /home/{{ username }}/idena-node-proxy/config.json
+          notify: idena-proxy-restart
+
+        - name: Overwrite variable in local file
+          become: no
+          ansible.builtin.template:
+            src: ./node/apikeys.j2
+            dest: "{{ api_keys_path }}"
+          delegate_to: localhost
+
+      tags: [never, IdenaApiKeysUpdate]
+      when: idenanode.stat.exists and idenaproxy.stat.exists
