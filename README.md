@@ -99,6 +99,7 @@ If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX
 - `IdenaNodeStop`: Stops the Idena Node.
 - `IdenaMiningOn`: Changes mining status to ON.
 - `IdenaMiningOff`: Changes mining status to OFF.
+- `IdenaApiKeysUpdate`: Updates Shared Node API keys after chaning values inside `./group_vars/main/api_keys.yaml` and `./group_vars/main/api_mgmt.yaml`.
 
 ## 🗒️&nbsp; Ater using the playbook there are a few things left to do:
 
