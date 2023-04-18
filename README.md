@@ -8,7 +8,7 @@
 
 ## 💬&nbsp; Overview
 
-The main goal of this playbook is to facilitate a quick and secure deployment of Idena Node/Shared Node. You can configure all parameters of your node/shared node and easily update your shared node API keys. If you choose to deploy a shared node, it will be deployed using an HTTPS connection. You can opt to use your own SSL certificate or a certificate from Let's Encrypt. If you choose to use Let's Encrypt, the certificate will be automatically updated via a special crontab task.
+The main goal of this playbook is to facilitate a quick and secure deployment of Idena Node / Shared Node. You can configure all parameters of your node / shared node and easily update your shared node API keys. If you choose to deploy a shared node, it will be deployed using an HTTPS connection. You can opt to use your own SSL certificate or a certificate from Let's Encrypt. If you choose to use Let's Encrypt, the certificate will be automatically updated via a special crontab task.
 
 ## 🫴&nbsp; Requirements:
 
@@ -29,7 +29,8 @@ The main goal of this playbook is to facilitate a quick and secure deployment of
 
 ### 🔐&nbsp; Secret and Public vars:
 
-- Secret and public variables are stored in separate files in the `./idena-sibling/group_vars/main/` folder.
+- Secret (`vault` file) and public (`vars` file) variables are stored in the `./idena-sibling/group_vars/main/` folder.
+- `api_keys.yaml` and `api_mgmt.yaml` consist of variables that are responsible for managing your API keys. `api_keys.yaml` consists of the complete list of your API keys that are supposed to be added to the remote node. `api_mgmt.yaml` consists of two variables that have keys which are supposed to be added and removed after shared node installation. The logic is pretty simple: first, import keys from `api_keys.yaml`, and then add keys from the `api_keys_add` variable and remove keys from the `api_keys_remove` variable in the `api_mgmt.yaml` file.
 - Public variables are stored in a plain text file with the name `vars`.
 - Sensitive variables are stored in a special secret vault file, which is saved as an encrypted file (`vault`).<br>To edit this file, you must remove the existing one and create a new file with your own password using the command `ansible-vault create vault`. To edit this file in the future, use the command `ansible-vault edit vault`. The file must have a similar structure to the example provided below:
 
@@ -39,8 +40,8 @@ vault_api_key: "your shared node api key"
 vault_node_key: "your shared node pure private key"
 userpass: "the password of the user under which name your shared node gonna be run"
 droplet_ip: "your droplet destination ip address"
+letsencrypt_email: "email@for_letsencrypt_certificate.com"
 droplet_domain: "your.droplet_domain.com"
-api_keys: [ "api_key_1", "api_key_2", "api_key_3" ]
 #ansible_ssh_pass: "your_droplet_root_pass"
 ```
 
