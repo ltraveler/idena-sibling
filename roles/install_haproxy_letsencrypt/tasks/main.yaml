@@ -50,7 +50,7 @@
     regexp: '^#\s*bind {{ droplet_ip | regex_escape }}:443.*$'
     line: "        bind {{ droplet_ip }}:443 ssl crt /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem"
     backrefs: yes
-  notify: ha-proxy-reload
+  notify: ha-proxy-enabled
 
 - name: Enabling SSL redirect
   ansible.builtin.lineinfile:
@@ -58,7 +58,7 @@
     regexp: '^#\s*http-request redirect scheme https unless.*$'
     line: "        http-request redirect scheme https unless { ssl_fc }"
     backrefs: yes
-  notify: ha-proxy-reload
+  notify: ha-proxy-enabled
 
 - name: Cron job for SSL certificate updates
   block:
@@ -78,7 +78,7 @@
         src: ./node/ssl_to_haproxy.j2
         dest: /etc/cron.d/ssl2haproxy
         mode: u+rw,g+r,o-rwx
-  notify: ha-proxy-reload
+  notify: ha-proxy-restart
 
 - name: Display Idena post install msg
   debug: msg={{ post_install_msg.split('\n') }}

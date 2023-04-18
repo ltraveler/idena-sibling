@@ -1,7 +1,12 @@
 ---
-- name: ha-proxy-reload
+- name: ha-proxy-enabled
   ansible.builtin.service:
     name: haproxy
     daemon_reload: true
     enabled: yes
     state: started
+
+- name: ha-proxy-restart
+  ansible.builtin.service:
+    name: haproxy
+    state: restarted
