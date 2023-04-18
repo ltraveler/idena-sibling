@@ -8,15 +8,16 @@
 
 ## 💬&nbsp; Overview
 
-The main goal of this playbook is to help shared node operators deploy Idena Shared Node quickly and securely on multiple servers. You can configure all parameters of your shared node and easily import your API keys. The shared node will be deployed using an HTTPS connection, and you will need an SSL certificate that you can purchase or obtain for free using the Let's Encrypt service.
+The main goal of this playbook is to facilitate a quick and secure deployment of Idena Node/Shared Node. You can configure all parameters of your node/shared node and easily update your shared node API keys. If you choose to deploy a shared node, it will be deployed using an HTTPS connection. You can opt to use your own SSL certificate or a certificate from Let's Encrypt. If you choose to use Let's Encrypt, the certificate will be automatically updated via a special crontab task.
 
 ## 🫴&nbsp; Requirements:
 
 ### Destination droplets:
 
-- Python version 3.9 or higher.
-- Your public SSH key must be added to the authorized_keys file on the server. Alternatively, you may use password authentication as a less secure option.
-- The script has been tested on Ubuntu 20.04 LTS and may work on other Debian-based distributions, but those have not been explicitly tested.
+- Python version 3.9 or higher is required.
+- Your public SSH key must be added to the authorized_keys file on the server. You can use the following command: `ssh-copy-id -i ~/.ssh/mykey user@host
+`. Alternatively, you may use password authentication as a less secure option. To change the authentication method, please modify the value of the `sshd_PasswordAuthentication` variable inside the `./group_vars/main/vars` file."
+- The script has been tested on Ubuntu 20.04 LTS and may work on other Debian-based distributions, but they have not been explicitly tested.
 
 ### Master node:
 
