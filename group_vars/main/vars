@@ -17,7 +17,6 @@ required_packages:
   ]
 sshd_PasswordAuthentication: "no"
 letsencrypt: "yes"
-letsencrypt_email: "ltraveler@protonmail.com"
 api_keys_path: "./group_vars/main/api_keys.yaml"
 maxinboundpeers: 12
 maxoutboundpeers: 6

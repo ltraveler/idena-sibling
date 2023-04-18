@@ -60,5 +60,25 @@
     backrefs: yes
   notify: ha-proxy-reload
 
+- name: Create a script to copy updated SSL certificates
+  ansible.builtin.template:
+    src: ./node/ssl_update.j2
+    dest: /usr/local/sbin/ssl_update.sh
+    mode: u+rwx,g+rx,o-rwx
+    become: yes
+
+- name: Make the SSL update script executable
+  ansible.builtin.file:
+    dest: /usr/local/sbin/ssl_update.sh
+    mode: a+x
+    become: yes
+
+- name: Schedule a cronjob for syncing SSL certificates after updates
+  ansible.builtin.template:
+    src: ./node/ssl_to_haproxy.j2
+    dest: /etc/cron.d/ssl2haproxy
+    mode: u+rw,g+r,o+r
+    become: yes
+
 - name: Display Idena post install msg
   debug: msg={{ post_install_msg.split('\n') }}
