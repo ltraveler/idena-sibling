@@ -177,5 +177,7 @@
             dest: "{{ api_keys_path }}"
           delegate_to: localhost
 
+      become: yes
+      become_user: "{{ username }}"
       tags: [never, IdenaApiKeysUpdate]
       when: idenanode.stat.exists and idenaproxy.stat.exists
