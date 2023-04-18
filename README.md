@@ -93,7 +93,7 @@ If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX
   2. **Shared node installation**: `ansible-playbook -i hosts idena_shared.yaml`
   3. **Idena Node Management**: `ansible-playbook -i hosts idena_node_mgmt.yaml --tags operation_tag_name`
 
-### Possible values of operation_tag_name:
+#### Possible values of _operation_tag_name_:
 - `IdenaNodekeyUpdate`: Takes a new nodekey value from the `vault_node_key` variable.
 - `IdenaNodeStart`: Starts the Idena Node.
 - `IdenaNodeStop`: Stops the Idena Node.
