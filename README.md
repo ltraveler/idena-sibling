@@ -79,7 +79,7 @@ public_key_file = ~/.ssh/id_rsa.pub
 
 If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier.
 
-## 🚀&nbsp; Install required collections and python libraries:
+## ⏳&nbsp; Install required collections and python libraries:
 
 - **Installing dnspython library** `pip3 install dnspython`
 - **Installing required ansible community modules** `ansible-galaxy install -r requirements.yml`
@@ -91,6 +91,14 @@ If you prefer to use root password authentication instead of SSH key authenticat
 
   1. **Regular node installation**: `ansible-playbook -i hosts idena_node.yaml`
   2. **Shared node installation**: `ansible-playbook -i hosts idena_shared.yaml`
+  3. **Idena Node Management**: `ansible-playbook -i hosts idena_node_mgmt.yaml --tags operation_tag_name`
+
+### Possible values of operation_tag_name:
+- `IdenaNodekeyUpdate`: Takes a new nodekey value from the `vault_node_key` variable.
+- `IdenaNodeStart`: Starts the Idena Node.
+- `IdenaNodeStop`: Stops the Idena Node.
+- `IdenaMiningOn`: Changes mining status to ON.
+- `IdenaMiningOff`: Changes mining status to OFF.
 
 ## 🗒️&nbsp; Ater using the playbook there are a few things left to do:
 
