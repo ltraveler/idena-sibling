@@ -86,14 +86,14 @@ If you prefer to use root password authentication instead of SSH key authenticat
 
 ## 🚀&nbsp; Run the playbook:
 
-- If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX.YYY.ZZZ.UUU` to automatically copy your **public SSH key** to the `authorized_keys` file on your destination droplet server.
-  After setting all parameters, run the playbook depends on what kind of installation you would like to make:
+If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX.YYY.ZZZ.UUU` to automatically copy your **public SSH key** to the `authorized_keys` file on your destination droplet server.
 
+### ☑&nbsp; After setting all parameters, run the playbook depends on what kind of installation you would like to make:
   1. **Regular node installation**: `ansible-playbook -i hosts idena_node.yaml`
   2. **Shared node installation**: `ansible-playbook -i hosts idena_shared.yaml`
   3. **Idena Node Management**: `ansible-playbook -i hosts idena_node_mgmt.yaml --tags operation_tag_name`
 
-### Possible values of operation_tag_name:
+#### Possible values of _operation_tag_name_:
 - `IdenaNodekeyUpdate`: Takes a new nodekey value from the `vault_node_key` variable.
 - `IdenaNodeStart`: Starts the Idena Node.
 - `IdenaNodeStop`: Stops the Idena Node.
