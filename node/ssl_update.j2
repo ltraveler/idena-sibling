@@ -1,3 +1,4 @@
 #!/bin/sh
 cat /etc/letsencrypt/live/{{ droplet_domain }}/fullchain.pem /etc/letsencrypt/live/{{ droplet_domain }}/privkey.pem | tee /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
 systemctl reload haproxy
+
