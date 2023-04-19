@@ -94,7 +94,7 @@ public_key_file = ~/.ssh/id_rsa.pub
 
 If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier and uncomment `ansible_connection=ssh` variable in the `hosts` file.
 
-## ⏳&nbsp; Install required collections and python libraries:
+## ⏳&nbsp; Install required collections and python libraries on your local machine:
 Before starting to use these playbooks, please install the required Python packages and Ansible-galaxy modules.
 
 - **Installing dnspython library** `pip3 install dnspython`
