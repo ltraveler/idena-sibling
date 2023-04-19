@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0 (Apr 18, 2023)
+
+### Changes
+
+- The playbooks in the repository have been completely refactored. Please check the [README.md](https://github.com/ltraveler/idena-sibling/blob/main/README.md) for full information about the changes.
+
 ## 0.1.1 (Feb 28, 2023)
 
 ### Bugfix
