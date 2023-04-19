@@ -16,7 +16,7 @@ The main goal of this playbook is to facilitate a quick and secure deployment of
 
 - Python version 3.9 or higher is required.
 - Your public SSH key must be added to the authorized_keys file on the server. You can use the following command: `ssh-copy-id -i ~/.ssh/mykey user@host
-`. Alternatively, you may use password authentication as a less secure option. To change the authentication method, please modify the value of the `sshd_PasswordAuthentication` variable inside the `./group_vars/main/vars` file."
+`. Alternatively, you may use password authentication as a less secure option. To change the authentication method, please modify the value of the `sshd_PasswordAuthentication` variable inside the `./group_vars/main/vars` file and uncomment the `ansible_connection` variable inside the `host` file located in the root of the repository folder.
 - The script has been tested on Ubuntu 20.04 LTS and may work on other Debian-based distributions, but they have not been explicitly tested.
 
 ### Master node:
@@ -50,6 +50,7 @@ droplet_domain: "your.droplet_domain.com"
 
 ### 📜&nbsp; Generating a PEM file for your SSL certificate:
 
+If you have your own SSL certificate for your shared node domain please check that the value of `letsencrypt` variable is set to `no`.
 Generally, after purchasing an SSL certificate, you will receive a file archive containing the following files.
 
 ```
@@ -61,6 +62,18 @@ server.key
 To generate a Privacy Enhanced Mail (PEM) file, you typically need to concatenate the two files using the following command inside the folder that contains the crt and key files:<br>`cat server.crt server.key > domain_pem`
 
 After creating your final PEM file called `domain_pem`, you would need to copy it (overwrite the existed one) to the `./idena-sibling/node/` folder of the repository and encrypt it using the command `ansible-vault encrypt domain_pem`.<br>If you want to change the contents of your certificate vault storage in the future, you can use the command `ansible-vault edit domain_pem`.
+
+### 📜&nbsp; Generate and Install a Let's Encrypt SSL Certificate:
+
+Apart from using your own SSL certificate, the certificate can be issued by the Let's Encrypt provider by setting the value of the `letsencrypt` variable to `yes`. In that case, please ensure that the A record of your shared node domain has been correctly set to the IP address of the droplet that you are using to install your shared node. If everything has been set correctly, you will end up with a fully configured shared node, including a special crontask to automatically update your Let's Encrypt SSL certificate before it expires.
+
+### 📢&nbsp; Public Variables Configuration
+
+The playbook has been configured to change all parameters from configuration files of idena-go and idena-node-proxy applications. You could have a look at `idena-sibling/group_vars/main/vars` file. Hovewer I will put your attention on the most important variables that with great probability you would like to change:
+
+`idena_go_ver: "1.0.3"` You need to set the latest version of the [Idena-go](https://github.com/idena-network/idena-go/releases) repository.
+`sshd_PasswordAuthentication: "no"` By setting this variable, you can choose to use or avoid using an SSH password to authenticate to your server. Please be careful when setting the value to `no`, as if you lose your private key, you won't be able to authenticate yourself in the droplet.
+`letsencrypt: "yes"` Choosing between Let's Encrypt SSL Certificate and your own SSL certificate that would be imported from `./node/domain_pem` file.
 
 ### 🎯&nbsp; Hosts configuration
 
@@ -79,24 +92,25 @@ public_key_file = ~/.ssh/id_rsa.pub
 #ansible_connection=ssh
 ```
 
-If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier.
+If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier and uncomment `ansible_connection=ssh` variable in the `hosts` file.
 
 ## ⏳&nbsp; Install required collections and python libraries:
+Before starting to use these playbooks, please install the required Python packages and Ansible-galaxy modules.
 
 - **Installing dnspython library** `pip3 install dnspython`
 - **Installing required ansible community modules** `ansible-galaxy install -r requirements.yml`
 
 ## 🚀&nbsp; Run the playbook:
 
-If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX.YYY.ZZZ.UUU` to automatically copy your **public SSH key** to the `authorized_keys` file on your destination droplet server.
+If the `host_key_checking` variable from `ansible.cfg` file is set to `false`, use `ssh-copy-id root@XXX.YYY.ZZZ.UUU` to automatically copy your **public SSH key** to the `authorized_keys` file on your destination droplet server.
 
 ### ☑&nbsp; After setting all parameters, run the playbook depends on what kind of installation you would like to make:
   1. **Regular node installation**: `ansible-playbook -i hosts idena_node.yaml`
   2. **Shared node installation**: `ansible-playbook -i hosts idena_shared.yaml`
-  3. **Idena Node Management**: `ansible-playbook -i hosts idena_node_mgmt.yaml --tags operation_tag_name`
+  3. **Management of Idena Node after installation**: `ansible-playbook -i hosts idena_node_mgmt.yaml --tags operation_tag_name`
 
 #### Possible values of _operation_tag_name_:
-- `IdenaNodekeyUpdate`: Takes a new nodekey value from the `vault_node_key` variable.
+- `IdenaNodekeyUpdate`: Takes a new nodekey (private key) value from the `vault_node_key` variable.
 - `IdenaNodeStart`: Starts the Idena Node.
 - `IdenaNodeStop`: Stops the Idena Node.
 - `IdenaMiningOn`: Changes mining status to ON.
@@ -105,8 +119,8 @@ If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX
 
 ## 🗒️&nbsp; Ater using the playbook there are a few things left to do:
 
-    ✦ Change DNS A record related to your droplet domain.
-    ✧ Try to reach your droplet domain through the web browser.
+    ✦ If you have used a custom SSL certificate option (letsencrypt: "no") and haven't done so already, change the DNS A record related to your droplet domain.
+    ✧ Try accessing your shared node's domain via a web browser using the "https://" prefix.
     ✧ Try to connect to your shared node using any of your API keys via app.idena.io.
     ✦ Please remember that after entering the API key and Shared Node URL in the app.idena.io, your status should become 'ONLINE'.
 
@@ -116,5 +130,5 @@ If the `host_key_checking` variable is set to `false`, use `ssh-copy-id root@XXX
 🌐 WWW: https://ltraveler.github.io<br>
 👛 `0xf041640788910fc89a211cd5bcbf518f4f14d831`<br>
 
-<ins>Please note</ins>: this is still a beta version, but it has been tested on the author's own droplets.
+<ins>Please note</ins>: All playbooks inside this repository have been tested on the author's own droplets.
 There's no warranty, one should use it at one's own risk.
