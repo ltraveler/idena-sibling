@@ -31,7 +31,9 @@ The main goal of this playbook is to facilitate a quick and secure deployment of
 
 - Secret (`vault` file) and public (`vars` file) variables are stored in the `./idena-sibling/group_vars/main/` folder.
 - `api_keys.yaml` and `api_mgmt.yaml` consist of variables that are responsible for managing your API keys. `api_keys.yaml` consists of the complete list of your API keys that are supposed to be added to the remote node. `api_mgmt.yaml` consists of two variables that have keys which are supposed to be added and removed after shared node installation. The logic is pretty simple: first, import keys from `api_keys.yaml`, and then add keys from the `api_keys_add` variable and remove keys from the `api_keys_remove` variable in the `api_mgmt.yaml` file.
+
 **Please note**: that the Shared Node Installation playbook (`idena_shared.yaml`) will import API keys from the `api_keys.yaml` file and ignore the values from the   `api_mgmt.yaml` file, such as `api_keys_add` and `api_keys_remove`. On the other hand, the Idena Node Management playbook (`idena_node_mgmt.yaml`) will use `api_keys_add` and `api_keys_remove` to add and remove keys from your remote droplet idena-node-proxy configuration. It will add new keys, remove old ones, and delete duplicates. After all of these manipulations, the `apiKeys` values will be synced with your local `api_keys.yaml` file.
+
 - Public variables are stored in a plain text file with the name `vars`.
 - Sensitive variables are stored in a special secret vault file, which is saved as an encrypted file (`vault`).<br>To edit this file, you must remove the existing one and create a new file with your own password using the command `ansible-vault create vault`. To edit this file in the future, use the command `ansible-vault edit vault`. The file must have a similar structure to the example provided below:
 
