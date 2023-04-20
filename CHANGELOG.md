@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 (Apr 20, 2023)
+
+### Bugfix
+
+- Small bug fixes and little improvements
+
 ## 0.2.0 (Apr 18, 2023)
 
 ### Changes
