@@ -64,3 +64,4 @@
     owner: "{{ username }}"
     group: "{{ idena_group }}"
     mode: "0664"
+  when: vault_node_key is defined
