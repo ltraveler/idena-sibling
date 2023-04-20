@@ -130,7 +130,7 @@
           notify: IdenaNodeRestart
 
       tags: [never, IdenaNodekeyUpdate]
-      when: vault_node_key is defined
+      when: vault_node_key | length != 0
 
     # Update API keys
     - name: Update node API keys

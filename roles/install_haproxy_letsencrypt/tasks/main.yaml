@@ -39,10 +39,32 @@
 - name: Getting certificate via certbot
   ansible.builtin.shell: |
     certbot certonly --standalone -d {{ droplet_domain }} --non-interactive --agree-tos --email {{ letsencrypt_email }} --http-01-port=8888
+  args:
+    executable: /bin/bash
+    chdir: /root
+
+- name: Check if fullchain.pem exists
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/{{ droplet_domain }}/fullchain.pem
+  register: fullchainpem
+
+- name: Check if privkey.pem exists
+  ansible.builtin.stat:
+    path: /etc/letsencrypt/live/{{ droplet_domain }}/privkey.pem
+  register: privkeypem
+
+- name: Getting certificate via certbot
+  ansible.builtin.shell: |
     cat /etc/letsencrypt/live/{{ droplet_domain }}/fullchain.pem /etc/letsencrypt/live/{{ droplet_domain }}/privkey.pem | sudo tee /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
   args:
     executable: /bin/bash
     chdir: /root
+  when: fullchainpem.stat.exists and privkeypem.stat.exists
+
+- name: Something went wrong with certbot response
+  fail:
+    msg: "Certbot failed to issue the certificate. The most common reason is that your A record has been set incorrectly or has not been updated globally. Another reason could be that you have exceeded the limit of requests to the Let's Encrypt server, and you will have to wait for an hour."
+  when: not (privkeypem.stat.exists and fullchainpem.stat.exists)
 
 - name: Enabling SSL
   ansible.builtin.lineinfile:
