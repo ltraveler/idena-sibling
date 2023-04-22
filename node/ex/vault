@@ -1,0 +1,8 @@
+---
+vault_api_key: e288dab99a8357371f527b41fe0439ba
+vault_node_key: 6XCh2EqlfhHjOmb82Z386XhyJ8abeeKORBTi9r2joVhz9594y2138H9xqv8PS2cXts1bYTDaBlu
+userpass: "eo4fejVM5jpA9Z"
+droplet_ip: "1.2.3.4"
+letsencrypt_email: "email@for_lets_encrypt.com"
+droplet_domain: "shared.node.domain.com"
+#ansible_ssh_pass="your_droplet_ssh_password"
