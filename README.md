@@ -10,6 +10,9 @@
 
 The main goal of this playbook is to facilitate a quick and secure deployment of Idena Node / Shared Node. You can configure all parameters of your node / shared node and easily update your shared node API keys. If you choose to deploy a shared node, it will be deployed using an HTTPS connection. You can opt to use your own SSL certificate or a certificate from Let's Encrypt. If you choose to use Let's Encrypt, the certificate will be automatically updated via a special crontab task.
 
+### 📚&nbsp; The complete guide of how to use Idena Sibling is available here:
+https://medium.com/@idna.project/6ff31873101b
+
 ## 🫴&nbsp; Requirements:
 
 ### Destination droplets:
