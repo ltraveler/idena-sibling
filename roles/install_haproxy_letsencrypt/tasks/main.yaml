@@ -102,5 +102,31 @@
         mode: u+rw,g+r,o-rwx
   notify: ha-proxy-restart
 
+- name: Creating a local copy of the issued certificate
+  block:
+    - name: Check if remote file exists
+      stat:
+        path: "/etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem"
+      register: ssl_domain_pem_remote
+
+    - name: Get local SSL cert file details
+      stat:
+        path: "./node/remote_ssl_clone/{{ droplet_domain }}.pem"
+      ignore_errors: yes
+      delegate_to: localhost
+      register: ssl_domain_pem_local
+
+    - name: Copy remote file if local file does not exist
+      when: ssl_domain_pem_local.stat.exists
+      fetch:
+        src: "/etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem"
+        dest: "./node/remote_ssl_clone/{{ droplet_domain }}.pem"
+
+    - name: Copy remote file if it is newer
+      when: ssl_domain_pem_remote.stat.exists and (not ssl_domain_pem_local.stat.exists or ssl_domain_pem_remote.stat.ctime > ssl_domain_pem_local.stat.ctime)
+      fetch:
+        src: "/etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem"
+        dest: "./node/remote_ssl_clone/{{ droplet_domain }}.pem"
+
 - name: Display Idena post install msg
   debug: msg={{ post_install_msg.split('\n') }}
