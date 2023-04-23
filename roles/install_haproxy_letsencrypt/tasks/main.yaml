@@ -113,6 +113,7 @@
       stat:
         path: "./node/remote_ssl_clone/{{ droplet_domain }}.pem"
       ignore_errors: yes
+      become: no
       delegate_to: localhost
       register: ssl_domain_pem_local
 
