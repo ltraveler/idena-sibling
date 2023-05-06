@@ -8,3 +8,4 @@ idena_group = Olga
 username = Olga
 public_key_file = ~/.ssh/id_rsa.pub
 #ansible_connection=ssh
+#ansible_ssh_port=10222
