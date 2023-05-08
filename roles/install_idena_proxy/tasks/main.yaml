@@ -77,6 +77,8 @@
 - name: Set idena_pm2_startup
   ansible.builtin.set_fact:
     idena_pm2_startup: "{{ idena_pm2_startup.stdout_lines[2] }}"
+  when: idenaproxy_status.stat.exists == false
 
 - name: print idena_pm2
   debug: msg={{ idena_pm2_startup }}
+  when: idenaproxy_status.stat.exists == false
