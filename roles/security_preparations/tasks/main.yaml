@@ -5,3 +5,4 @@
     state: present
     exclusive: true
     key: "{{ lookup('file', '{{ public_key_file }}') }}"
+  when: public_key_file is defined and public_key_file != ''
