@@ -48,7 +48,8 @@ userpass: "the password of the user under which name your shared node gonna be r
 droplet_ip: "your droplet destination ip address"
 letsencrypt_email: "email@for_letsencrypt_certificate.com"
 droplet_domain: "your.droplet_domain.com"
-#ansible_ssh_pass: "your_droplet_root_pass"
+#ansible_ssh_pass: "your_droplet_ssh_sudo_pass"
+#ansible_sudo_pass: "your_droplet_sudo_pass"
 ```
 
 - To avoid having to re-enter your vault storage password every time you want to edit it, please save it in the `.vault_pass` plain text file in the root folder of the repository.
