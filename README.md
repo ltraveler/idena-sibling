@@ -96,9 +96,12 @@ idena_group = Olga
 username = Olga
 public_key_file = ~/.ssh/id_rsa.pub
 #ansible_connection=ssh
+#ansible_ssh_port=10222
 ```
 
 If you prefer to use root password authentication instead of SSH key authentication, you will need to set your root password in the vault data storage under `ansible_ssh_pass` variable as described earlier and uncomment `ansible_connection=ssh` variable in the `hosts` file.
+
+`#ansible_ssh_port=10222` - if you are using a non-standard SSH port, you would need to uncomment and set it here.
 
 ## ⏳&nbsp; Install required collections and python libraries on your local machine:
 Before starting to use these playbooks, please install the required Python packages and Ansible-galaxy modules.
