@@ -24,6 +24,7 @@
       tags: [haproxy_inst_letsencrypt]
       vars:
         current_domain_ip: "{{ lookup('community.general.dig', droplet_domain) }}"
+        droplet_ip: "{{ ansible_host | shell('curl -s ifconfig.me') }}"
       when: current_domain_ip == droplet_ip and letsencrypt|bool == True
     - role: install_haproxy
       tags: [haproxy_inst]

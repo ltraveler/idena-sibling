@@ -69,8 +69,8 @@
 - name: Enabling SSL
   ansible.builtin.lineinfile:
     dest: /etc/haproxy/haproxy.cfg
-    regexp: '^#\s*bind {{ droplet_ip | regex_escape }}:443.*$'
-    line: "        bind {{ droplet_ip }}:443 ssl crt /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem"
+    regexp: '^#\s*bind {{ ip_droplet_address | regex_escape }}:443.*$'
+    line: "        bind {{ ip_droplet_address }}:443 ssl crt /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem"
     backrefs: yes
   notify: ha-proxy-enabled
 

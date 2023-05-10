@@ -1,8 +1,9 @@
+{% set ip_droplet_address = ansible_host | shell('ifconfig | grep "inet " | grep -v 127.0.0.1 | awk \'{print $2}\'') %}
 frontend www-http
-        bind {{ droplet_ip }}:80
+        bind {{ ip_droplet_address }}:80
         acl letsencrypt-acl path_beg /.well-known/acme-challenge/
         use_backend letsencrypt-backend if letsencrypt-acl
-#        bind {{ droplet_ip }}:443 ssl crt /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
+#        bind {{ ip_droplet_address }}:443 ssl crt /etc/ssl/{{ droplet_domain }}/{{ droplet_domain }}.pem
         # redirects HTTP to HTTPS
 #        http-request redirect scheme https unless { ssl_fc }
 
