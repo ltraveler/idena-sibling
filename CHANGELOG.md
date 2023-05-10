@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.3 (Apr 20, 2023)
+## 0.2.3 (May 10, 2023)
 
 ### Changes
 
