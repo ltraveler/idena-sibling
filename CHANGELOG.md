@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3 (Apr 20, 2023)
+
+### Changes
+
+- The 'droplet_ip' variable has been deprecated. All the required data will now be taken from the droplet response.
+
 ## 0.2.1 (Apr 20, 2023)
 
 ### Bugfix
