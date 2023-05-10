@@ -14,6 +14,7 @@ required_packages:
     netcat-traditional,
     python3-pip,
     certbot,
+    net-tools,
   ]
 sshd_PasswordAuthentication: "no"
 letsencrypt: "yes"

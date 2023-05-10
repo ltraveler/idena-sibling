@@ -1,8 +1,23 @@
 ---
+- name: Get my public IP
+  hosts: main
+  become: yes
+  tasks:
+    - name: Get my public IP
+      community.general.ipify_facts:
+
+    - name: Get local IP address
+      ansible.builtin.shell:
+        cmd: "ifconfig | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}'"
+      register: ip_droplet_address_full
+
+    - name: Save IP address only to ip_droplet_address
+      ansible.builtin.set_fact:
+        ip_droplet_address: "{{ ip_droplet_address_full.stdout_lines | first }}"
+
 - name: Idena Deployment
   hosts: main
   become: yes
-
   roles:
     - install_required_packages
     - disable_ssh_password
@@ -24,8 +39,7 @@
       tags: [haproxy_inst_letsencrypt]
       vars:
         current_domain_ip: "{{ lookup('community.general.dig', droplet_domain) }}"
-        droplet_ip: "{{ ansible_host | shell('curl -s ifconfig.me') }}"
-      when: current_domain_ip == droplet_ip and letsencrypt|bool == True
+      when: current_domain_ip == ipify_public_ip and letsencrypt|bool == True
     - role: install_haproxy
       tags: [haproxy_inst]
       when: letsencrypt|bool == False
