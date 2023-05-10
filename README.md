@@ -45,7 +45,6 @@ https://medium.com/@idna.project/6ff31873101b
 vault_api_key: "your shared node api key"
 vault_node_key: "your shared node pure private key"
 userpass: "the password of the user under which name your shared node gonna be run"
-droplet_ip: "your droplet destination ip address"
 letsencrypt_email: "email@for_letsencrypt_certificate.com"
 droplet_domain: "your.droplet_domain.com"
 #ansible_ssh_pass: "your_droplet_ssh_sudo_pass"
