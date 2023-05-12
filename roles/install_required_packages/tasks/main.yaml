@@ -1,11 +1,4 @@
 ---
-- name: Updating apt repo and cache
-  ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=100
-
-- name: Install IDENA requiered packages
-  ansible.builtin.apt:
-    pkg: "{{ required_packages }}"
-
 - name: Checking if reboot is required
   stat:
     path: /var/run/reboot-required

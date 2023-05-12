@@ -6,6 +6,13 @@
     - name: Get my public IP
       community.general.ipify_facts:
 
+    - name: Updating apt repo and cache
+      ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=100
+
+    - name: Install IDENA requiered packages
+      ansible.builtin.apt:
+        pkg: "{{ required_packages }}"
+
     - name: Get local IP address
       ansible.builtin.shell:
         cmd: "ifconfig | grep 'inet ' | grep -v 127.0.0.1 | awk '{print $2}'"
