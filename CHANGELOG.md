@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.5 (May 12, 2023)
+
+### Bugfix
+
+- `net-tools` is required for running shared node installation playbook.
+
 ## 0.2.3 (May 10, 2023)
 
 ### Changes
