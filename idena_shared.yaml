@@ -9,9 +9,15 @@
     - name: Updating apt repo and cache
       ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=100
 
-    - name: Install IDENA requiered packages
+    - name: Gather the package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Install net-tools if not present
       ansible.builtin.apt:
-        pkg: "{{ required_packages }}"
+        name: net-tools
+        state: present
+      when: "'net-tools' not in ansible_facts.packages"
 
     - name: Get local IP address
       ansible.builtin.shell:
