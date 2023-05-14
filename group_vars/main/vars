@@ -1,5 +1,5 @@
 ---
-idena_go_ver: "1.0.3"
+idena_go_ver: "1.0.4"
 required_packages:
   [
     jq,
