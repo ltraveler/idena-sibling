@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.7 (May 15, 2023)
+
+### Changes
+
+- Allow 'latest' as a valid string option for 'idena_go_ver' variable to download the latest version of the idena-go node client.
+
 ## 0.2.5 (May 12, 2023)
 
 ### Bugfix
