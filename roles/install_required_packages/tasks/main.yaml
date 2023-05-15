@@ -6,6 +6,11 @@
   ansible.builtin.apt:
     pkg: "{{ required_packages }}"
 
+- name: Remove conflicting packages
+  ansible.builtin.apt:
+    name: python3-openssl
+    state: absent
+
 - name: Checking if reboot is required
   stat:
     path: /var/run/reboot-required
@@ -17,6 +22,11 @@
 
 - name: Installing required python packages
   ansible.builtin.pip:
-    name:
+    name: "{{ pip_packages }}"
+    extra_args: "{{ '--upgrade' if packages is defined and 'pyOpenSSL' in packages else '' }}"
+  vars:
+    pip_packages:
+      - pyOpenSSL
       - pexpect
+      - github3.py
   become: yes

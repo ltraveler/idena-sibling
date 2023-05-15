@@ -13,6 +13,20 @@
     group: "{{ idena_group }}"
   when: idenago_status.stat.exists == false
 
+- name: Get the latest release tag
+  community.general.github_release:
+    user: idena-network
+    repo: idena-go
+    action: latest_release
+  register: latest_idenago_release
+
+- set_fact:
+    idenago_rep_ver: "{{ latest_idenago_release.tag | regex_replace('^v', '') }}"
+
+- set_fact:
+    idena_go_ver: "{{ idenago_rep_ver }}"
+  when: idena_go_ver == 'latest'
+
 - name: Download latest idena-go build
   ansible.builtin.get_url:
     url: https://github.com/idena-network/idena-go/releases/download/v{{ idena_go_ver }}/idena-node-linux-{{ idena_go_ver }}
