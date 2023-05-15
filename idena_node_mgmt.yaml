@@ -17,6 +17,13 @@
       become: true
       become_user: "{{ username }}"
 
+    - name: idena-go-x
+      ansible.builtin.file:
+        dest: /home/{{ username }}/idena-go/idena-node
+        mode: a+x
+        owner: "{{ username }}"
+        group: "{{ idena_group }}"
+
   tasks:
     - name: Check if idena node daemon is run
       ansible.builtin.service_facts:
@@ -182,3 +189,60 @@
       become_user: "{{ username }}"
       tags: [never, IdenaApiKeysUpdate]
       when: idenanode.stat.exists and idenaproxy.stat.exists
+
+    # Idena-go update
+    - name: Idena-go update
+      block:
+        - name: Get latest release of a public repository
+          community.general.github_release:
+            user: idena-network
+            repo: idena-go
+            action: latest_release
+          register: latest_idenago_release
+
+        - name: Get idenago droplet version
+          ansible.builtin.shell:
+            cmd: ./idena-node --version
+            chdir: /home/{{ username }}/idena-go/
+          register: idenago_droplet_ver
+
+        - set_fact:
+            idenago_rep_ver: "{{ latest_idenago_release.tag | regex_replace('^v', '') }}"
+            idenago_drop_ver: "{{ idenago_droplet_ver.stdout | regex_replace('[^0-9.]', '') }}"
+
+        - set_fact:
+            idena_go_ver: "{{ idenago_rep_ver }}"
+          when: idena_go_ver == 'latest'
+
+        - name: Information about idena-go latest
+          ansible.builtin.debug:
+            msg: "Repository version: {{ idenago_rep_ver }}"
+
+        - name: var_debug
+          ansible.builtin.debug:
+            msg: "Droplet version: {{ idenago_drop_ver }}"
+
+        - name: var_debug
+          ansible.builtin.debug:
+            msg: "Variable version: {{ idena_go_ver }}"
+
+        - name: stop idena-go service
+          ansible.builtin.service:
+            name: idena_{{ username }}
+            state: stopped
+          when: idenago_drop_ver is version_compare(idena_go_ver, '!=')
+
+        - name: Download latest idena-go build
+          ansible.builtin.get_url:
+            url: https://github.com/idena-network/idena-go/releases/download/v{{ idena_go_ver }}/idena-node-linux-{{ idena_go_ver }}
+            dest: /home/{{ username }}/idena-go/idena-node
+            mode: "0755"
+            owner: "{{ username }}"
+            group: "{{ idena_group }}"
+            force: true
+          when: idenago_drop_ver is version_compare(idena_go_ver, '!=')
+          notify:
+            - idena-go-x
+            - IdenaNodeRestart
+
+      tags: [never, IdenagoUpdate]
