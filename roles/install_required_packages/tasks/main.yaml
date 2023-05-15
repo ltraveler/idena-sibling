@@ -23,7 +23,7 @@
 - name: Installing required python packages
   ansible.builtin.pip:
     name: "{{ pip_packages }}"
-    extra_args: "{{ '--upgrade' if packages is defined and 'pyOpenSSL' in packages else '' }}"
+    extra_args: "{{ '--upgrade' if pip_packages is defined and 'pyOpenSSL' in pip_packages else '' }}"
   vars:
     pip_packages:
       - pyOpenSSL
