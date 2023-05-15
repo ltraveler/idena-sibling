@@ -214,15 +214,15 @@
             idena_go_ver: "{{ idenago_rep_ver }}"
           when: idena_go_ver == 'latest'
 
-        - name: Information about idena-go latest
+        - name: idena-go latest repository version
           ansible.builtin.debug:
             msg: "Repository version: {{ idenago_rep_ver }}"
 
-        - name: var_debug
+        - name: idena-go installed droplet version
           ansible.builtin.debug:
             msg: "Droplet version: {{ idenago_drop_ver }}"
 
-        - name: var_debug
+        - name: idena-go variable version
           ansible.builtin.debug:
             msg: "Variable version: {{ idena_go_ver }}"
 
