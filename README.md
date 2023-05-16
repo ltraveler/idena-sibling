@@ -125,6 +125,7 @@ If the `host_key_checking` variable from `ansible.cfg` file is set to `false`, u
 - `IdenaMiningOn`: Changes mining status to ON.
 - `IdenaMiningOff`: Changes mining status to OFF.
 - `IdenaApiKeysUpdate`: Updates Shared Node API keys after chaning values inside `./group_vars/main/api_keys.yaml` and `./group_vars/main/api_mgmt.yaml`.
+- `IdenagoUpdate`: Updates your idena-go node client to the version specified in the `idena_go_ver` variable. If `idena_go_ver` is set to `latest`, it will upgrade the `idena-go` node client to the latest version.
 
 ## 🗒️&nbsp; Ater using the playbook there are a few things left to do:
 
