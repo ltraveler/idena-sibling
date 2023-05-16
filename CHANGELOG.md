@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.9 (May 16, 2023)
+
+### Changes
+
+- A new tag, 'IdenagoUpdate', has been added to be used with the 'idena_node_mgmt.yaml' playbook. It will update the `idena-go` node client to the version that has been set in `idena_go_ver` [variable](https://github.com/ltraveler/idena-sibling/blob/main/group_vars/main/vars). The value `latest` will update the node client to the latest release version.
+
 ## 0.2.7 (May 15, 2023)
 
 ### Changes
