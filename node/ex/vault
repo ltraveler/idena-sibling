@@ -5,4 +5,5 @@ vault_node_key: 6XCh2EqlfhHjOmb82Z386XhyJ8abeeKORBTi9r2joVhz9594y2138H9xqv8PS2cX
 userpass: "eo4fejVM5jpA9Z"
 letsencrypt_email: "email@for_lets_encrypt.com"
 droplet_domain: "shared.node.domain.com"
-#ansible_ssh_pass="your_droplet_ssh_password"
+#ansible_ssh_pass: "your_droplet_ssh_sudo_pass"
+#ansible_sudo_pass: "your_droplet_sudo_pass"
