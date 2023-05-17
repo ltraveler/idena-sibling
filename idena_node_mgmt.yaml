@@ -245,7 +245,7 @@
             - idena-go-x
             - IdenaNodeRestart
 
-      tags: [never, IdenagoUpdate]
+      tags: [never, IdenaGoUpdate]
 
     # Idena-node-proxy update
     - name: Idena-go update
