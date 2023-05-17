@@ -53,7 +53,7 @@
     chdir: /home/{{ username }}/idena-go/datadir
   become: true
   become_user: "{{ username }}"
-  when: idenago_status.stat.exists == false
+  when: idenago_status.stat.exists == false and idenachain_bootstrap == 'yes'
 
 - name: Template config.json to idena-go
   ansible.builtin.template:
