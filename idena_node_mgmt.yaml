@@ -246,3 +246,40 @@
             - IdenaNodeRestart
 
       tags: [never, IdenagoUpdate]
+
+    # Idena-node-proxy update
+    - name: Idena-go update
+      block:
+        - name: Checking if Idena proxy exists
+          ansible.builtin.stat: path=/home/{{ username }}/idena-node-proxy
+          register: idenaproxy_status
+
+        - name: "Cloning idena-node-proxy"
+          ansible.builtin.shell: |
+            pm2 stop idena-node-proxy
+            curl -L  "https://github.com/idena-network/idena-node-proxy/archive/master.tar.gz" | tar -xzf -
+            mv -f idena-node-proxy-master idena-node-proxy
+          args:
+            executable: /bin/bash
+            chdir: /home/{{ username }}/
+          when: idenaproxy_status.stat.exists == true
+
+        - name: idena-node-proxy preparation
+          ansible.builtin.shell: |
+            sed -i 's/app.listen(parseInt(config.port));/app.listen(parseInt(config.port), '"'"'localhost'"'"');/g' index.js
+          args:
+            executable: /bin/bash
+            chdir: /home/{{ username }}/idena-node-proxy
+          when: idenaproxy_status.stat.exists == true
+
+        - name: Running Idena Proxy
+          ansible.builtin.shell: |
+            npm install
+            npm start
+            pm2 restart idena-node-proxy
+          args:
+            executable: /bin/bash
+            chdir: /home/{{ username }}/idena-node-proxy
+          when: idenaproxy_status.stat.exists == true
+
+      tags: [never, IdenaProxyUpdate]
