@@ -250,10 +250,6 @@
     # Idena-node-proxy update
     - name: Idena-go update
       block:
-        - name: Checking if Idena proxy exists
-          ansible.builtin.stat: path=/home/{{ username }}/idena-node-proxy
-          register: idenaproxy_status
-
         - name: "Cloning idena-node-proxy"
           ansible.builtin.shell: |
             pm2 stop idena-node-proxy
@@ -262,7 +258,7 @@
           args:
             executable: /bin/bash
             chdir: /home/{{ username }}/
-          when: idenaproxy_status.stat.exists == true
+          when: idenaproxy.stat.exists == true
 
         - name: idena-node-proxy preparation
           ansible.builtin.shell: |
@@ -270,16 +266,18 @@
           args:
             executable: /bin/bash
             chdir: /home/{{ username }}/idena-node-proxy
-          when: idenaproxy_status.stat.exists == true
+          when: idenaproxy.stat.exists == true
 
         - name: Running Idena Proxy
           ansible.builtin.shell: |
             npm install
             npm start
-            pm2 restart idena-node-proxy
           args:
             executable: /bin/bash
             chdir: /home/{{ username }}/idena-node-proxy
-          when: idenaproxy_status.stat.exists == true
+          when: idenaproxy.stat.exists == true
+          notify: idena-proxy-restart
 
+      become: true
+      become_user: "{{ username }}"
       tags: [never, IdenaProxyUpdate]

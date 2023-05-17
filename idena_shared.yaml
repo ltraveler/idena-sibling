@@ -6,18 +6,10 @@
     - name: Get my public IP
       community.general.ipify_facts:
 
-    - name: Updating apt repo and cache
-      ansible.builtin.apt: update_cache=yes upgrade=dist cache_valid_time=100
-
-    - name: Gather the package facts
-      ansible.builtin.package_facts:
-        manager: auto
-
-    - name: Install net-tools if not present
+    - name: Install net-tools package
       ansible.builtin.apt:
         name: net-tools
-        state: present
-      when: "'net-tools' not in ansible_facts.packages"
+        update_cache: yes
 
     - name: Get local IP address
       ansible.builtin.shell:

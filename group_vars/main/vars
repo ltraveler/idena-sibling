@@ -12,8 +12,8 @@ required_packages:
     psmisc,
     unzip,
     netcat-traditional,
-    python3-pip,
     certbot,
+    python3-pip,
     net-tools,
   ]
 sshd_PasswordAuthentication: "no"
