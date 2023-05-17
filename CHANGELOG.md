@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.0 (May 17, 2023)
+
+### Changes
+
+- A new tag, `IdenaProxyUpdate`, has been added to be used with the `idena_node_mgmt.yaml` playbook. It will update the `idena-node-proxy` to the latest version.
+
+### Bugfix
+
+- Critical bug fixes.
+
 ## 0.2.9 (May 16, 2023)
 
 ### Changes
