@@ -37,9 +37,6 @@ https://medium.com/@idna.project/6ff31873101b
 
 **Please note**: that the Shared Node Installation playbook (`idena_shared.yaml`) will import API keys from the `api_keys.yaml` file and ignore the values from the   `api_mgmt.yaml` file, such as `api_keys_add` and `api_keys_remove`. On the other hand, the Idena Node Management playbook (`idena_node_mgmt.yaml`) will use `api_keys_add` and `api_keys_remove` to add and remove keys from your remote droplet idena-node-proxy configuration. It will add new keys, remove old ones, and delete duplicates. After all of these manipulations, the `apiKeys` values will be synced with your local `api_keys.yaml` file.
 
-- Public variables are stored in the `./idena-sibling/group_vars/main/vars` file and can be edited directly using a text editor of your choice. The default parameters should be sufficient for most shared node deployment processes.
-- In case if you don't want to download the bootstrap [idenachain.db](https://github.com/ltraveler/idenachain.db) archive you would have to set `idenachain_bootstrap` variable to `no`.
-- The public variable `idena_go_ver` supports not only version numbers like `1.0.4` but also the value `latest`, which means that the latest version of the idena-go node client will be downloaded.
 - Sensitive variables are stored in a special secret vault file, which is saved as an encrypted file (`./idena-sibling/group_vars/main/vault`).<br>To edit this file, you must remove the existing one and create a new file with your own password using the command `ansible-vault create vault`. To edit this file in the future, use the command `ansible-vault edit vault`. The file must have a similar structure to the example provided below:
 
 ```
@@ -78,9 +75,10 @@ Apart from using your own SSL certificate, the certificate can be issued by the 
 
 The playbook has been configured to change all parameters from configuration files of idena-go and idena-node-proxy applications. You could have a look at `idena-sibling/group_vars/main/vars` file. Hovewer I will put your attention on the most important variables that with great probability you would like to change:
 
-`idena_go_ver: "1.0.3"` You need to set the latest version of the [Idena-go](https://github.com/idena-network/idena-go/releases) repository.
-`sshd_PasswordAuthentication: "no"` By setting this variable, you can choose to use or avoid using an SSH password to authenticate to your server. Please be careful when setting the value to `no`, as if you lose your private key, you won't be able to authenticate yourself in the droplet.
-`letsencrypt: "yes"` Choosing between Let's Encrypt SSL Certificate and your own SSL certificate that would be imported from `./node/domain_pem` file.
+- In case if you don't want to download the bootstrap [idenachain.db](https://github.com/ltraveler/idenachain.db) archive you would have to set `idenachain_bootstrap` variable to `no`.
+- The public variable `idena_go_ver` supports not only version numbers like `1.0.4` but also the value `latest`, which means that the latest version of the [Idena-go](https://github.com/idena-network/idena-go/releases) node client will be downloaded.
+- `sshd_PasswordAuthentication: "no"` By setting this variable, you can choose to use or avoid using an SSH password to authenticate to your server. Please be careful when setting the value to `no`, as if you lose your private key, you won't be able to authenticate yourself in the droplet.
+- `letsencrypt: "yes"` Choosing between Let's Encrypt SSL Certificate and your own SSL certificate that would be imported from `./node/domain_pem` file.
 
 ### 🎯&nbsp; Hosts configuration
 
