@@ -126,6 +126,7 @@ If the `host_key_checking` variable from `ansible.cfg` file is set to `false`, u
 - `IdenaApiKeysUpdate`: Updates Shared Node API keys after chaning values inside `./group_vars/main/api_keys.yaml` and `./group_vars/main/api_mgmt.yaml`.
 - `IdenaGoUpdate`: Updates your idena-go node client to the version specified in the `idena_go_ver` variable. If `idena_go_ver` is set to `latest`, it will upgrade the `idena-go` node client to the latest version.
 - `IdenaProxyUpdate`: Updates your idena-node-proxy to the latest version.
+- `IdenaChainRefresh`: Initiates a complete resync of the Idena blockchain.
 
 ## 🗒️&nbsp; Ater using the playbook there are a few things left to do:
 
