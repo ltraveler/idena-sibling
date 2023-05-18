@@ -281,3 +281,24 @@
       become: true
       become_user: "{{ username }}"
       tags: [never, IdenaProxyUpdate]
+
+    # idenachain.db resync
+    - name: Idena-go update
+      block:
+        - name: stop idena-go service
+          ansible.builtin.service:
+            name: idena_{{ username }}
+            state: stopped
+          when: ansible_facts.services["idena_" + username + ".service"].state == 'running'
+
+        - name: Remove idenachain.db
+          ansible.builtin.file:
+            path: /home/{{ username }}/idena-go/datadir/idenachain.db
+            state: absent
+          notify:
+            - IdenaNodeRestart
+          when: idenanode.stat.exists
+
+      notify:
+        - IdenaNodeRestart
+      tags: [never, IdenaChainRefresh]
