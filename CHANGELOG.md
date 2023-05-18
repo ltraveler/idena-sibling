@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.1 (May 18, 2023)
+
+### Changes
+
+- A new tag, `IdenaChainRefresh`, has been added to the `idena_node_mgmt.yaml` playbook. This tag will initiate a complete resync of the Idena blockchain.
+
 ## 0.3.0 (May 17, 2023)
 
 ### Changes
