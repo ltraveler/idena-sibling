@@ -127,6 +127,7 @@ If the `host_key_checking` variable from `ansible.cfg` file is set to `false`, u
 - `IdenaGoUpdate`: Updates your idena-go node client to the version specified in the `idena_go_ver` variable. If `idena_go_ver` is set to `latest`, it will upgrade the `idena-go` node client to the latest version.
 - `IdenaProxyUpdate`: Updates your idena-node-proxy to the latest version.
 - `IdenaChainRefresh`: Initiates a complete resync of the Idena blockchain.
+- `IPFSRefresh`: Initiates a complete resync of the IPFS.
 
 ## 🗒️&nbsp; Ater using the playbook there are a few things left to do:
 
