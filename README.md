@@ -40,7 +40,7 @@ https://medium.com/@idna.project/6ff31873101b
 
 **Please note**: that the Shared Node Installation playbook (`idena_shared.yaml`) will import API keys from the `api_keys.yaml` file and ignore the values from the `api_mgmt.yaml` file, such as `api_keys_add` and `api_keys_remove`.
 
-On the other hand, the Idena Node Management playbook (`idena_node_mgmt.yaml`) will use `api_keys_add` and `api_keys_remove` to add and remove keys from your remote droplet idena-node-proxy configuration. It will add new keys, remove old ones, and delete duplicates. After all of these manipulations, the `apiKeys` values will be synced with your local `api_keys.yaml` file.
+On the other hand, the Idena Node Management playbook (`idena_node_mgmt.yaml`) will use `api_keys_add` and `api_keys_remove` variables from the `api_mgmt.yaml` file to add and remove keys on your shared node idena-node-proxy configuration. It will add new keys, remove old ones, and delete duplicates. After all of these manipulations, the `apiKeys` values will be synced with your local `./idena-sibling/group_vars/main/api_keys.yaml` file.
 
 So, you would always have a fresh and synchronized copy of your droplet API keys.
 
