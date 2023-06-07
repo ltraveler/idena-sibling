@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3 (June 06, 2023)
+
+### Bugfix
+
+- Pin the pyOpenSSL version to ensure strict compatibility and prevent potential conflicts.
+
 ## 0.3.2 (May 19, 2023)
 
 ### Changes
