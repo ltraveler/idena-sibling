@@ -27,7 +27,7 @@
     extra_args: "{{ '--upgrade' if pip_packages is defined and 'pyOpenSSL' in pip_packages else '' }}"
   vars:
     pip_packages:
-      - pyOpenSSL
+      - pyOpenSSL==23.1.1
       - pexpect
       - github3.py
   become: yes
