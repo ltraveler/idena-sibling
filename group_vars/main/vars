@@ -20,6 +20,7 @@ sshd_PasswordAuthentication: "no"
 letsencrypt: "yes"
 idenachain_bootstrap: "yes"
 api_keys_path: "./group_vars/main/api_keys.yaml"
+idenago_folder: "idena-go"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"
@@ -31,8 +32,8 @@ godkey: null
 inp_logs_fn: "access.log"
 logs_output: "file"
 ipfsport: 40405
-blockpinthreshold: 0.3
-flippinthreshold: 0.5
+blockpinthreshold: 1
+flippinthreshold: 1
 loadallflips: "true"
 allflipsloadingtime: 7200000000000
 fastsync: "true"
