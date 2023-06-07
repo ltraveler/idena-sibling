@@ -20,7 +20,6 @@ sshd_PasswordAuthentication: "no"
 letsencrypt: "yes"
 idenachain_bootstrap: "yes"
 api_keys_path: "./group_vars/main/api_keys.yaml"
-idenago_folder: "idena-go"
 maxinboundpeers: 12
 maxoutboundpeers: 6
 httphost: "localhost"
